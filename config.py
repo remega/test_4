@@ -3,8 +3,8 @@ project = 'f' #availible: g, f
 if project is 'g':
     model = None
 elif project is 'f':
-    data_base = 'vr' #availible: vr, vr_new
-    mode = 'off_line' #availible: off_line, on_line, data_processor
+    data_base = 'vr_new' #availible: vr, vr_new
+    mode = 'data_processor' #availible: off_line, on_line, data_processor
     if_learning_v = True
     if mode is 'off_line':
         if_off_line_debug = False
@@ -12,8 +12,8 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor':
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_obdl_cfg'#availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
-                                                 # minglang_obdl_cfg
+        data_processor_id = 'minglang_get_ground_truth_heatmap'#availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
+                                                 # minglang_obdl_cfg,minglang_get_ground_truth_heatmap
 '''log config'''
 if mode is 'off_line':
     if if_off_line_debug is True:
@@ -188,7 +188,8 @@ elif project is 'f':
         'MercedesBenz',
         'Motorbike',
         'Murder',
-        'Let\'sNotBeAloneTonight',
+        # 'Let\'sNotBeAloneTonight',
+        'NotBeAloneTonight',
         'Orion',
         'Parachuting',
         'Parasailing',
@@ -282,7 +283,7 @@ elif project is 'f':
         elif data_base is 'vr_new':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
-            game_dic = game_dic[:1]
+            game_dic = game_dic[0:10]
 
 '''default config'''
 

@@ -87,7 +87,7 @@ def create_tmux_commands(session, logdir):
             base_cmd = [
                 'CUDA_VISIBLE_DEVICES=', sys.executable, 'worker.py',
                 '--log-dir', logdir,
-                '--env-id', env_seq_id[i / config.num_workers_global],
+                '--env-id', env_seq_id[i // config.num_workers_global],
                 '--num-workers', str(config.num_workers_total_global)]
             cmds_map += [new_tmux_cmd(session,
                                       "w-%d" % i,

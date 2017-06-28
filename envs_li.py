@@ -107,18 +107,23 @@ class env_li():
         from config import observation_space
         self.observation_space = observation_space
 
+        '''salmap'''
+        self.salmap_width = 360
+        self.salmap_height = 180
+
+
         '''set all temp dir for this worker'''
         if (self.mode is 'off_line') or (self.mode is 'data_processor'):
             self.temp_dir = "temp/get_view/w_" + str(self.task) + '/'
         elif self.mode is 'on_line':
             self.temp_dir = "temp/get_view/g_" + str(self.env_id) + '_s_' + str(self.subject) + '/'
-        print(self.task)
-        print(self.temp_dir)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>task: "+str(self.task))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>temp_dir: "+str(self.temp_dir))
         '''clear temp dir for this worker'''
         subprocess.call(["rm", "-r", self.temp_dir])
         subprocess.call(["mkdir", "-p", self.temp_dir])
 
-        print("env set to: "+str(self.env_id))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>env set to: "+str(self.env_id))
 
         '''frame bug'''
         '''some bug in the frame read for some video,='''
@@ -133,10 +138,17 @@ class env_li():
 
         '''get subjects'''
         '''load in mat data of head movement'''
-        matfn = '../../'+self.data_base+'/FULLdata_per_video_frame.mat'
+        # matfn = '../../'+self.data_base+'/FULLdata_per_video_frame.mat'
+        matfn = '/home/minglang/vr_new/video_data_mat.mat'
         data_all = sio.loadmat(matfn)
         data = data_all[self.env_id]
+        # data = data_all
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.env_id: "+str(self.env_id))
+
         self.subjects_total, self.data_total, self.subjects, _ = get_subjects(data,0)
+
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>subjects_total: "+str(self.subjects_total))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>data_total: "+str(self.data_total))
 
         self.reward_dic_on_cur_episode = []
         if self.mode is 'on_line':
@@ -153,9 +165,14 @@ class env_li():
 
 
         '''init video and get paramters'''
-        video = cv2.VideoCapture('../../'+self.data_base+'/' + self.env_id + '.mp4')
+        # video = cv2.VideoCapture('../../'+self.data_base+'/' + self.env_id + '.mp4')
+        video = cv2.VideoCapture('/home/minglang/vr_new/'+self.env_id + '.mp4')
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>video: "+video)
+        # video = cv2.VideoCapture('/home/minglang/vr_new/A380.mp4')
         self.frame_per_second = video.get(cv2.cv.CV_CAP_PROP_FPS)
         self.frame_total = video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>frame_total: "+str(self.frame_total))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.env_id: "+str(self.env_id))
         self.video_size_width = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
         self.video_size_heigth = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
         self.second_total = self.frame_total / self.frame_per_second
@@ -169,6 +186,7 @@ class env_li():
 
         '''compute step_total'''
         self.step_total = int(self.data_total / self.data_per_step) + 1
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>step_total: "+str(self.step_total))
 
         '''set fov range'''
         from config import view_range_lon, view_range_lat
@@ -312,9 +330,66 @@ class env_li():
                     shutil.copy(CONFIG_FILE,cfg_file)
                     print("os.makedirs(cfg_file)")
 
+        # get and save groundtruth_heatmap
+        if data_processor_id is 'minglang_get_ground_truth_heatmap':
+
+            print('>>>>>>>>>>>>>>>>>>>>minglang_get_ground_truth_heatmap<<<<<<<<<<<<<<<<<<<<<<<<<')
+            print(dsnfj)
+            self.save_gt_heatmaps()
+
 
         print('=============================data process end, programe terminate=============================')
         print(t)
+
+    def save_gt_heatmaps(self):
+        print('save_gt_heatmaps')
+
+        '''for fixation'''
+        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
+        groundtruth_heatmaps=[]
+        for step in range(self.step_total):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+            try:
+                groundtruth_fixation = np.zeros((self.subjects_total, 2))
+                for subject in range(self.subjects_total):
+                    # print("self.subjects_total: ",self.subjects_total)
+                    # print(s_qiao)
+                    groundtruth_fixation[subject, 0] = self.subjects[subject].data_frame[data].p[0]
+                    groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
+                groundtruth_heatmap = self.fixation2salmap_sp_my_sigma(groundtruth_fixation, self.salmap_width, self.salmap_height, my_sigma = sigma)
+                self.save_heatmap(heatmap=groundtruth_heatmap,
+                                  path='gt_heatmap_sp_sigma_half_fov',
+                                  name=str(step))
+                groundtruth_heatmaps += [groundtruth_heatmap]
+                print(np.shape(groundtruth_heatmaps))
+            except Exception,e:
+                print Exception,":",e
+                continue
+        print(s)
+
+    def fixation2salmap_sp_my_sigma(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
+        fixation_total = np.shape(fixation)[0]
+        x_degree_per_pixel = 360.0 / mapwidth
+        y_degree_per_pixel = 180.0 / mapheight
+        salmap = np.zeros((mapwidth, mapheight))
+        for x in range(mapwidth):
+            for y in range(mapheight):
+                cur_lon = x * x_degree_per_pixel - 180.0
+                cur_lat = y * y_degree_per_pixel - 90.0
+                for fixation_count in range(fixation_total):
+                    cur_fixation_lon = fixation[fixation_count][0]
+                    cur_fixation_lat = fixation[fixation_count][1]
+                    distance_to_cur_fixation = haversine(lon1=cur_lon,
+                                                         lat1=cur_lat,
+                                                         lon2=cur_fixation_lon,
+                                                         lat2=cur_fixation_lat)
+                    distance_to_cur_fixation = distance_to_cur_fixation / math.pi * 180.0
+                    sal = math.exp(-1.0 / 2.0 * (distance_to_cur_fixation**2) / (my_sigma**2))
+                    salmap[x, y] += sal
+        salmap = salmap * ( 1.0 / np.amax(salmap) )
+        salmap = np.transpose(salmap)
+        return salmap
 
     def log_thread_config(self):
 
@@ -668,4 +743,5 @@ class env_li():
 
     def save_heatmap(self,heatmap,path,name):
         heatmap = heatmap * 255.0
-        cv2.imwrite(path+'/'+name+'.jpg',heatmap)
+        cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
+        # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
