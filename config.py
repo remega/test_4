@@ -12,8 +12,14 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor':
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_ground_truth_heatmap'#availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
-                                                 # minglang_obdl_cfg,minglang_get_ground_truth_heatmap
+        data_processor_id = 'minglang_get_ours_groundhp_cc'
+     # availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
+     # minglang_obdl_cfg,minglang_get_ground_truth_heatmap
+     # ming_fcb_cc, minglang_get_bms_groundhp_cc
+     # minglang_get_ours_groundhp_cc
+     # minglang_get_fcb
+     # minglang_get_bms_groundhp_cc
+     # minglang_get_obdl_groundhp_cc
 '''log config'''
 if mode is 'off_line':
     if if_off_line_debug is True:
@@ -229,6 +235,23 @@ elif project is 'f':
         'WesternSichuan',
         'Yacht',
     ]
+    f_game_dic_new_test = [
+    'KingKong',
+    'SpaceWar2',
+    'StarryPolar',
+    'Dancing',
+    'Guitar',
+    'BTSRun',
+    'InsideCar',
+    'RioOlympics',
+    'SpaceWar',
+    'CMLauncher2',
+    'Waterfall',
+    'Sunset',
+    'BlueWorld',
+    'Symphony',
+    'WaitingForLove'
+    ]
 
 '''env config'''
 if project is 'g':
@@ -283,7 +306,9 @@ elif project is 'f':
         elif data_base is 'vr_new':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
-            game_dic = game_dic[0:10]
+            #ming here debug
+            # game_dic = game_dic[10:20]
+            game_dic = f_game_dic_new_test[0:10] # for test the cc
 
 '''default config'''
 
