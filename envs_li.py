@@ -114,6 +114,9 @@ class env_li():
         "fcb"
         self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height)
 
+        "cal nss"
+        from suppor_lib import calc_score_nss
+        self.calc_score_nss = calc_score_nss
 
         '''set all temp dir for this worker'''
         if (self.mode is 'off_line') or (self.mode is 'data_processor'):
@@ -256,34 +259,62 @@ class env_li():
             # print(game_dic_new_all)
 
         if data_processor_id is 'minglang_mp4_to_jpg':
-            from config import game_dic_new_all
-            for i in range(len(game_dic_new_all)):
-                # print(game_dic_new_all[i])
-                if i >= 1 and i <= len(game_dic_new_all): #len(game_dic_new_all)
-                    # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
-                    # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
-                    # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
-                    file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
-                    file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(game_dic_new_all[i])+'.yuv'
+            from config import f_game_dic_new_test
+            # for i in range(len(f_game_dic_new_test)):
+            # print(game_dic_new_all[i])
+            i = 0
+            # if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
+                # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
+                # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
+                # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
+            file_in_1 = '/home/minglang/vr_new/'+str(f_game_dic_new_test[i])+'.mp4'
+            print('minglang/YuhangSong')
+            # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(f_game_dic_new_test[i])+'.jpg'
 
-                    video = cv2.VideoCapture(file_in_1)
-                    self.video = video
-                    self.frame_per_second = round(video.get(cv2.cv.CV_CAP_PROP_FPS))
-                    self.frame_total = round(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+            video = cv2.VideoCapture(file_in_1)
+            self.video = video
+            self.frame_per_second = round(video.get(cv2.cv.CV_CAP_PROP_FPS))
+            self.frame_total = round(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 
-                    for frame_i in range(int(self.frame_total)):
+            for frame_i in range(int(self.frame_total)):
 
-                        try:
-                            rval, frame = self.video.read()
-                            # here minglang 1
-                            cv2.imwrite('/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(game_dic_new_all[i])+'_'+str(frame_i)+'.jpg',frame)
-                            print(frame_i)
-                        except Exception, e:
-                            print('failed on this frame, continue')
-                            print Exception,":",e
-                            continue
+                try:
+                    rval, frame = self.video.read()
+                    # here minglang 1
+                    # cv2.imwrite('/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(game_dic_new_all[i])+'_'+str(frame_i)+'.jpg',frame)
+                    cv2.imwrite('/home/minglang/PAMI/kingkong/'+str(f_game_dic_new_test[i])+'_'+str(frame_i)+'.jpg',frame)
+                    print(frame_i)
+                except Exception, e:
+                    print('failed on this frame, continue')
+                    print Exception,":",e
+                    continue
 
                     print('end processing: ',file_in_1,self.frame_per_second,self.frame_total)
+
+        if data_processor_id is 'minglang_avi_to_jpg':
+            from config import f_game_dic_new_test
+
+            file_in_1 = '/home/minglang/PAMI/salicon/'+self.env_id+'_out'+'.avi'
+            print('inglang/YuhangSong')
+
+            video = cv2.VideoCapture(file_in_1)
+            self.video = video
+            self.frame_per_second = round(video.get(cv2.cv.CV_CAP_PROP_FPS))
+            self.frame_total = round(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+
+            for frame_i in range(int(self.frame_total)):
+
+                try:
+                    rval, frame = self.video.read()
+                    cv2.imwrite('/home/minglang/PAMI/salicon/salicon_all_jpg/'+self.env_id+'_'+str(frame_i)+'.jpg',frame)
+                    print(frame_i)
+                except Exception, e:
+                    print('failed on this frame, continue')
+                    print Exception,":",e
+                    continue
+
+            print('end processing: ',file_in_1,self.frame_per_second,self.frame_total)
+
 
         if data_processor_id is 'minglang_obdl_cfg':
             from config import game_dic_new_all
@@ -399,8 +430,10 @@ class env_li():
 
         # minglang_get_ours_groundhp_cc
         if data_processor_id is 'minglang_get_ours_groundhp_cc':
-            self.save_ours_heatmap()
-            # self.cal_ours_ground_cc()
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_cc start<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # self.save_ours_heatmap()
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            self.cal_ours_ground_cc()
 
         # minglang_get_bms_groundtruh
         if data_processor_id is 'minglang_get_bms_groundhp_cc':
@@ -413,16 +446,128 @@ class env_li():
 
         # minglang_get_obdl_groundtruh
         if data_processor_id is 'minglang_get_obdl_groundhp_cc':
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.obdl_begin')
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.obdl_begin<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             # get the obdl with step
             # self.save_obdl_heatmaps()
             # cal minglang_get_obdl_groundhp_cc
             self.cal_obdl_ground_cc()
 
+        # minglang_get_salicon_groundtruh_cc
+        if data_processor_id is 'minglang_get_salicon_groundhp_cc':
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>salicon_begin<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # get the obdl with step
+            self.save_setps_heatmap(src_path ='/home/minglang/PAMI/salicon/salicon_all_jpg/' ,
+                                    dst_path ='/home/minglang/PAMI/salicon/salicon_steps_jpg/',
+                                    with_fcb = False)
+            # cal minglang_get_obdl_groundhp_cc
+
+            # self.cal_nss(src_path = '/home/minglang/PAMI/salicon/salicon_steps_jpg/' ,
+            #             dst_all_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ss_all/' ,
+            #             dst_ave_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ave_ss/')
+
 
         print('=============================data process end, asfsa,programe terminate=============================')
         print(t)
         print('==========================data process start: '+data_processor_id+'================================')
+
+
+
+    def save_setps_heatmap(self,src_path,dst_path,with_fcb = False):
+        heatmaps = []
+        for step in range(self.step_total):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+
+            try:
+                # file_name = '/home/minglang/PAMI/gt_heatmap_sp_sigma_half_fov/'+self.env_id+'_'+str(step)+'.jpg'
+                #for our's hmap
+                file_name = src_path+str(self.env_id)+'_'+str(step)+'.jpg'
+                # file_name = source_path + str(self.env_id)+'_'+str(step)+'.jpg'
+                print(">>>>>>>>>>>>>>load_gt_heatmaps----self.env_id-----print step: ",self.env_id,step)
+                temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+                temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
+                # with fcb
+                if with_fcb is True:
+                    temp = np.multiply(temp,self.fcb_map)
+                print('max(temp):', np.max(temp))
+                temp = temp
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>normal_nized temp: ", np.max(temp))
+                self.save_heatmap(heatmap=temp,
+                                  path=dst_path,
+                                  name=str(step))
+                heatmaps += [temp]
+                print(np.shape(heatmaps))
+            except Exception,e:
+                print Exception,":",e
+                continue
+
+        print(s)
+
+    def cal_cc(self,src_path, dst_all_cc_path,dst_ave_cc_path):
+        ccs = []
+        fcb_maps = []
+
+        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = src_path) #load ours heatmap
+        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth() #load ground-truth heatmap
+        print('np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
+        print('np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
+
+        for step in range(self.step_total-1):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+            print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+            # self.save_heatmap(heatmap=fcb_map,
+            #                   path='/home/minglang/PAMI/fcb_err',
+            #                   name=str(self.env_id))
+            cc = self.calc_score(self.gt_heatmaps_ours[step],self.gt_heatmaps_groundtruth[step])
+            print(step)
+            self.save_step_cc(cc=cc,
+                              step=step,
+                              path = dst_all_cc_path)
+            if(step > 0):
+              ccs += [cc]
+
+        print("here right")
+            # print(sfd)
+        self.cc_averaged = sum(ccs)/len(ccs)
+        self.save_ave_cc(self.cc_averaged,
+                         path = dst_ave_cc_path)
+        print("cc average "+str(self.cc_averaged))
+        print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+    def cal_nss(self,src_path, dst_all_ss_path,dst_ave_ss_path):
+        ccs = []
+        fcb_maps = []
+
+        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = src_path) #load ours heatmap
+        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth() #load ground-truth heatmap
+        print('np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
+        print('np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
+
+        for step in range(self.step_total-1):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+            print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+            # self.save_heatmap(heatmap=fcb_map,
+            #                   path='/home/minglang/PAMI/fcb_err',
+            #                   name=str(self.env_id))
+            cc = self.calc_score_nss(gtsAnn = self.gt_heatmaps_groundtruth[step], resAnn =  self.gt_heatmaps_ours[step])
+            print('>>>>>>cc = self.calc_score_nss: ',cc)
+            print(step)
+            self.save_step_cc(cc=cc,
+                              step=step,
+                              path = dst_all_ss_path)
+            if(step > 0):
+              ccs += [cc]
+
+        print("here right")
+            # print(sfd)
+        self.cc_averaged = sum(ccs)/len(ccs)
+        self.save_ave_cc(self.cc_averaged,
+                         path = dst_ave_ss_path)
+        print("cc average "+str(self.cc_averaged))
+        print('>>>>>>>>>>>>>>>>>>>>cal_ss_end<<<<<<<<<<<<<<<<<<<<<<<<<')
+
 
     def save_ours_heatmap(self):
         heatmaps = []
@@ -441,17 +586,16 @@ class env_li():
                 # with fcb
                 temp = np.multiply(temp,self.fcb_map)
                 temp = temp / 255.0
+                self.save_heatmap(heatmap=temp,
+                                  path='/home/minglang/PAMI/ff_best_heatmaps_ours_with_fcb/',
+                                  name=str(step))
                 heatmaps += [temp]
                 print(np.shape(heatmaps))
             except Exception,e:
                 print Exception,":",e
                 continue
 
-            self.save_heatmap(heatmap=heatmap,
-                              path='/home/minglang/PAMI/ff_best_heatmaps_ours_with_fcb/',
-                              name=str(step))
-
-        return heatmaps
+        print(s)
 
 
     def save_obdl_heatmaps(self):
@@ -478,7 +622,7 @@ class env_li():
         print(s)
 
     def cal_obdl_ground_cc(self):
-        print('>>>>>>>>>>>>>>>>>>>>cal_ours_ground_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
         ccs = []
         fcb_maps = []
 
@@ -512,7 +656,7 @@ class env_li():
 
 
     def cal_bms_ground_cc(self):
-        print('>>>>>>>>>>>>>>>>>>>>cal_ours_ground_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print('>>>>>>>>>>>>>>>>>>>>cal_bms_ground_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
         ccs = []
         fcb_maps = []
 
@@ -524,7 +668,7 @@ class env_li():
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
-            print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+            print('>>>>>cal_bms_ground_cc-------self.step_total----step: ',self.step_total,step)
             # self.save_heatmap(heatmap=fcb_map,
             #                   path='/home/minglang/PAMI/fcb_err',
             #                   name=str(self.env_id))
@@ -542,7 +686,7 @@ class env_li():
         self.save_ave_cc(self.cc_averaged,
                          path = '/home/minglang/PAMI/cc_result/bms_and_ground/ave_cc_with_fcb/')
         print("cc average "+str(self.cc_averaged))
-        print('>>>>>>>>>>>>>>>>>>>>cal_ours_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
+        print('>>>>>>>>>>>>>>>>>>>>cal_bms_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
 
 
@@ -555,7 +699,6 @@ class env_li():
         self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth() #load ground-truth heatmap
         print('np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
         print('np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
-
 
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
@@ -623,8 +766,8 @@ class env_li():
                 for fixation_count in range(fixation_total):
                     cur_fixation_lon = fixation[fixation_count][0]
                     cur_fixation_lat = fixation[fixation_count][1]
-                    print("cur_fixation_lon: ",cur_fixation_lon)
-                    print("cur_fixation_lat: ",cur_fixation_lat)
+                    # print("cur_fixation_lon: ",cur_fixation_lon)
+                    # print("cur_fixation_lat: ",cur_fixation_lat)
                     # distance_to_cur_fixation = ((cur_lon-cur_lat)^2+(cur_fixation_lon-cur_fixation_lat)^2)^0.5
                     distance_to_cur_fixation = ((cur_lon-cur_fixation_lon)**2+(cur_lat-cur_fixation_lat)**2)**0.5
                     # distance_to_cur_fixation = math.sqrt(int((cur_lon-cur_lat)^2+(cur_fixation_lon-cur_fixation_lat)^2))
@@ -649,8 +792,8 @@ class env_li():
                 for fixation_count in range(fixation_total):
                     cur_fixation_lon = fixation[fixation_count][0]
                     cur_fixation_lat = fixation[fixation_count][1]
-                    print("cur_fixation_lon: ",cur_fixation_lon)
-                    print("cur_fixation_lat: ",cur_fixation_lat)
+                    # print("cur_fixation_lon: ",cur_fixation_lon)
+                    # print("cur_fixation_lat: ",cur_fixation_lat)
                     # distance_to_cur_fixation = ((cur_lon-cur_lat)^2+(cur_fixation_lon-cur_fixation_lat)^2)^0.5
                     distance_to_cur_fixation = ((cur_lon-cur_fixation_lon)**2+(cur_lat-cur_fixation_lat)**2)**0.5
                     # distance_to_cur_fixation = math.sqrt(int((cur_lon-cur_lat)^2+(cur_fixation_lon-cur_fixation_lat)^2))
@@ -768,14 +911,14 @@ class env_li():
                     groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
                 groundtruth_heatmap = self.fixation2salmap_sp_my_sigma(groundtruth_fixation, self.salmap_width, self.salmap_height, my_sigma = sigma)
                 self.save_heatmap(heatmap=groundtruth_heatmap,
-                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap',
+                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap/',
                                   name=str(step))
                 groundtruth_heatmaps += [groundtruth_heatmap]
                 print(np.shape(groundtruth_heatmaps))
             except Exception,e:
                 print Exception,":",e
                 continue
-        # print(s)
+        print(s)
 
     def fixation2salmap_sp_my_sigma(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
         fixation_total = np.shape(fixation)[0]

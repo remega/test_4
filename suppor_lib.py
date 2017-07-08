@@ -226,3 +226,32 @@ def fixation2salmap(fixation, mapwidth, mapheight, my_sigma_in_degree = (11.75+1
     salmap = salmap * (1.0 / np.amax(salmap))
     salmap = np.transpose(salmap)
     return salmap
+
+# def cal_score_nss(self):
+def calc_score_nss(gtsAnn, resAnn):
+    """ss
+    Computer NSS score.
+    :param gtsAnn : ground-truth annotations
+    :param resAnn : predicted saliency map
+    :return score: int : NSS score
+    """
+
+    salMap = resAnn - np.mean(resAnn)
+    ave_ss = []
+    # if np.max(salMap) > 0:
+    salMap = salMap / np.std(salMap)
+    print(np.max(salMap))
+
+    # print("np.shape(salMap),np.shape(gtsAnn): ", np.shape(salMap), np.shape(gtsAnn))
+
+    for x in range(180):
+        for y in range(360):
+            if gtsAnn[x][y] > 0:
+                ave_ss.append(salMap[x][y])
+                # print("ave_ss.append(salMap[x][y]):",x,y,salMap[x][y])
+
+    ave_ss = np.mean(ave_ss)
+
+    # np.mean([ salMap[x][y] for y,x in gtsAnn])
+
+    return ave_ss
