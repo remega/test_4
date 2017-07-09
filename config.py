@@ -12,16 +12,17 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor':
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_salicon_groundhp_cc'
+        data_processor_id = 'minglang_get_obdl_groundhp_cc'
      # availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
      # minglang_obdl_cfg,minglang_get_ground_truth_heatmap
      # minglang_avi_to_jpg
-     # ming_fcb_cc, minglang_get_bms_groundhp_cc
+     # ming_fcb_cc,
+     # minglang_get_bms_groundhp_cc
      # minglang_get_ours_groundhp_cc
      # minglang_get_fcb
      # minglang_get_bms_groundhp_cc
      # minglang_get_obdl_groundhp_cc
-     # minglang_get_salicon_groundhp_cc
+     # minglang_get_salicon_groundhp_ss
 '''log config'''
 if mode is 'off_line':
     if if_off_line_debug is True:
