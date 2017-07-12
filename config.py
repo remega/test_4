@@ -14,7 +14,9 @@ elif project is 'f':
         if_data_provessor_debug = True
         data_processor_id = 'minglang_get_obdl_groundhp_cc'
      # availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
-     # minglang_obdl_cfg,minglang_get_ground_truth_heatmap
+     # minglang_obdl_cfg,
+     # minglang_get_ground_truth_heatmap
+     # minglang_get_ground_truth_heatmap_for_nss
      # minglang_avi_to_jpg
      # ming_fcb_cc,
      # minglang_get_bms_groundhp_cc
