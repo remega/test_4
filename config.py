@@ -12,7 +12,7 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor':
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_obdl_groundhp_cc'
+        data_processor_id = 'minglang_mp4_to_yuv'
      # availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
      # minglang_obdl_cfg,
      # minglang_get_ground_truth_heatmap
@@ -313,7 +313,7 @@ elif project is 'f':
         if if_data_provessor_debug is True:
             #ming here debug
             # game_dic = game_dic[10:20]
-            game_dic = f_game_dic_new_test[0:15] # for test the cc
+            game_dic = f_game_dic_new_test[0:1] # for test the cc
 
 '''default config'''
 

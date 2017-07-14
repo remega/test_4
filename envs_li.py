@@ -241,18 +241,23 @@ class env_li():
 
         if data_processor_id is 'minglang_mp4_to_yuv':
             print('sssss')
-            from config import game_dic_new_all
-            for i in range(len(game_dic_new_all)):
+            from config import f_game_dic_new_test
+            for i in range(len(f_game_dic_new_test)):
                 # print(game_dic_new_all[i])
-                if i >= 0 and i <= 0: #len(game_dic_new_all)
+                if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
                     # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
-                    file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
-                    file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
+                    # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
+                    # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
+                    ################################## wang ################################################
+
+                    file_out_1 = '/media/minglang/My Passport/online_model/ff/save/'+self.env_id+'.yuv'
+                    file_in_1 = '/media/minglang/My Passport/online_model/ff/save/'+self.env_id+'.mp4'
                     self.video = cv2.VideoCapture(file_in_1)
                     input_width_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
                     input_height_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
                     self.mp4_to_yuv(input_width_1,input_height_1,file_in_1,file_out_1)
-                    print('end processing: ',file_out_1)
+                    # print('end processing: ',file_out_1)
+                    print('end processing: ')
 
             # print('len_game_dic_new_all: ',len(game_dic_new_all))
             # print('get_view')
