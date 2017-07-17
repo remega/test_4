@@ -242,22 +242,22 @@ class env_li():
         if data_processor_id is 'minglang_mp4_to_yuv':
             print('sssss')
             from config import f_game_dic_new_test
-            for i in range(len(f_game_dic_new_test)):
+            # for i in range(len(f_game_dic_new_test)):
                 # print(game_dic_new_all[i])
-                if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
+                # if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
                     # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
                     # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
                     # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
                     ################################## wang ################################################
 
-                    file_out_1 = '/media/minglang/My Passport/online_model/ff/save/'+self.env_id+'.yuv'
-                    file_in_1 = '/media/minglang/My Passport/online_model/ff/save/'+self.env_id+'.mp4'
-                    self.video = cv2.VideoCapture(file_in_1)
-                    input_width_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-                    input_height_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-                    self.mp4_to_yuv(input_width_1,input_height_1,file_in_1,file_out_1)
-                    # print('end processing: ',file_out_1)
-                    print('end processing: ')
+            file_out_1 = '/home/minglang/save/'+self.env_id+'.yuv'
+            file_in_1 = '/home/minglang/save/'+self.env_id+'.mp4'
+            self.video = cv2.VideoCapture(file_in_1)
+            input_width_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
+            input_height_1 = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+            self.mp4_to_yuv(input_width_1,input_height_1,file_in_1,file_out_1)
+            # print('end processing: ',file_out_1)
+            print('end processing: ')
 
             # print('len_game_dic_new_all: ',len(game_dic_new_all))
             # print('get_view')
@@ -456,12 +456,14 @@ class env_li():
             print("cc average "+str(self.cc_averaged))
 
         # minglang_get_ours_groundhp_cc
-        if data_processor_id is 'minglang_get_ours_groundhp_cc':
+        if data_processor_id is 'minglang_get_ours_groundhp_cc_ss':
             print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_cc start<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             # self.save_ours_heatmap()
+            ############################### cal cc  #########################################
             # self.cal_ours_ground_cc()
+
             ############################### cal nss #########################################
-            with_fcb = True # True Flase
+            with_fcb = False # True Flase
             if with_fcb is True:
                 self.cal_nss(src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_with_fcb/',
                         dst_all_ss_path ='/home/minglang/PAMI/ss_result /ours_and_ground/ss_all_steps_with_fcb/' ,
@@ -548,6 +550,26 @@ class env_li():
         print('=============================data process end, asfsa,programe terminate=============================')
         print(t)
 
+    def mp4_to_yuv(self,input_width_1,input_height_1,file_in_1,file_out_1):
+        import  subprocess as sp
+        FFMPEG_BIN = "ffmpeg"
+        # format = str(1920960)
+        command = [
+            FFMPEG_BIN,
+            '-i', file_in_1,
+            '-s','1920x960', #bo space
+            file_out_1
+            ]
+
+        pipe = sp.Popen(command)
+        print(" mp4_to_yuv")
+
+        # ffmpeg -i /tmp/a.wav -s 640x480 -i /tmp/a.yuv
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        #  ffmpeg -i /home/minglang/save/BlueWorld.mp4 -s 1920x960 /home/minglang/save/BlueWorld.yuv
+
+        # ffmpeg -i file_in_1 -c:v rawvideo -(input_width_1 * input_height_1) yuv420p file_out_1
+    #    ffmpeg -i file_in_1 -c:v rawvideo -(input_width_1 * input_height_1) yuv420p file_out_1
 
 
 
@@ -627,9 +649,10 @@ class env_li():
         ccs = []
         fcb_maps = []
 
-        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = src_path) #load ours heatmap
+        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = src_path) # load ours heatmap
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>cal_nss self.gt_heatmaps_ours end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(nss_cc = True) #load ground-truth heatmap
+        # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(nss_cc = True) #load ground-truth heatmap
+        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth_for_nss_N(nss_cc = True) #load ground-truth heatmap
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.gt_heatmaps_groundtruth end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
         for step in range(self.step_total-1):
@@ -640,11 +663,11 @@ class env_li():
             #                   path='/home/minglang/PAMI/fcb_err',
             #                   name=str(self.env_id))
             cc = self.calc_score_nss(gtsAnn = self.gt_heatmaps_groundtruth[step], resAnn =  self.gt_heatmaps_ours[step])
-            gtsAnn = self.gt_heatmaps_groundtruth[step]
-            resAnn =  self.gt_heatmaps_ours[step]
-            print("np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn", np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn)
-            print('>>>>>>ss = self.calc_score_nss: ',cc)
-            print(step)
+            # gtsAnn = self.gt_heatmaps_groundtruth[step]
+            # resAnn =  self.gt_heatmaps_ours[step]
+            # print("np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn", np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn)
+            # print('>>>>>>ss = self.calc_score_nss: ',cc)
+            # print(step)
             self.save_step_cc(cc=cc,
                               step=step,
                               path = dst_all_ss_path)
@@ -992,6 +1015,30 @@ class env_li():
 
         return heatmaps
 
+    def load_gt_heatmaps_for_nss(self,source_path):
+        heatmaps = []
+        for step in range(self.step_total-1):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+
+            try:
+                # file_name = '/home/minglang/PAMI/gt_heatmap_sp_sigma_half_fov/'+self.env_id+'_'+str(step)+'.jpg'
+                #for our's hmap
+                # file_name = '/home/minglang/PAMI/ff_best_heatmaps_ours/'+str(self.env_id)+'/'+str(step)+'.jpg'
+                file_name = source_path + str(self.env_id)+'_'+str(step)+'.jpg'
+                print(">>>>>>>>>>>>>>load_gt_heatmaps----self.env_id-----print step: ",self.env_id,step)
+                temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+                temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
+                temp = temp
+                heatmaps += [temp]
+                print(np.shape(heatmaps))
+            except Exception,e:
+                print Exception,":",e
+                continue
+
+        return heatmaps
+
+
     def load_gt_heatmaps_groundtruth(self,nss_cc = True):
         heatmaps = []
         for step in range(self.step_total-1):
@@ -1008,6 +1055,31 @@ class env_li():
                 temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
                 temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
                 temp = temp / 255.0
+                heatmaps += [temp]
+                print(np.shape(heatmaps))
+            except Exception,e:
+                print Exception,":",e
+                continue
+
+        return heatmaps
+
+
+    def load_gt_heatmaps_groundtruth_for_nss_N(self,nss_cc = True):
+        heatmaps = []
+        for step in range(self.step_total-1):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+
+            try:
+                #for ground-truth's hmap
+                if nss_cc is True:
+                    file_name = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/'+self.env_id+'_'+str(step)+'.jpg'
+                else:
+                    file_name = '/home/minglang/PAMI/test_file/ground_truth_hmap/'+self.env_id+'_'+str(step)+'.jpg'
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>load_gt_heatmaps_groundtruth_print step: ",step)
+                temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+                # temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
+                temp = temp
                 heatmaps += [temp]
                 print(np.shape(heatmaps))
             except Exception,e:
@@ -1048,9 +1120,8 @@ class env_li():
         print('save_gt_heatmaps')
 
         '''for fixation'''
-        # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
-        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))*0.5#cc is large .chose half of sigma
         groundtruth_heatmaps=[]
+
         for step in range(self.step_total):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
@@ -1064,10 +1135,11 @@ class env_li():
                     # tow single value
                     # print(">>>>>>>>>: np.shape(groundtruth_fixation[subject, 0]), np.shape(groundtruth_fixation[subject, 1]): ",groundtruth_fixation[subject, 0], groundtruth_fixation[subject, 1])
                     # print("np.shape(groundtruth_fixation): ", np.shape(groundtruth_fixation)) # = (58,2)
-                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height, my_sigma = sigma)
-                self.save_heatmap(heatmap=groundtruth_heatmap,
-                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss/',
-                                  name=str(step))
+                # get 58 subject on one step's locations
+                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height)
+                self.save_heatmap_for_nss(heatmap=groundtruth_heatmap,
+                                          path='/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
+                                          name=str(step))
                 groundtruth_heatmaps += [groundtruth_heatmap]
                 print("np.shape(groundtruth_heatmaps): ", np.shape(groundtruth_heatmaps))
             except Exception,e:
@@ -1075,6 +1147,45 @@ class env_li():
                 continue
             # print(s)
         print(s)
+
+    def fixation2salmap_for_nss(self,fixation, mapwidth, mapheight):
+        fixation_total = np.shape(fixation)[0]
+        # print(">>>>>>>>>>>>>>fixation_total = np.shape(fixation)[0]: ", fixation_total)# = 58
+        x_degree_per_pixel = 360.0 / mapwidth
+        y_degree_per_pixel = 180.0 / mapheight
+        salmap = np.zeros((mapwidth, mapheight))
+        # print(salmap)
+        # salmap = []
+        i = 0
+        # print(">>>>>>>>>>>> x_degree_per_pixel,y_degree_per_pixel,salmap = np.zeros((mapwidth, mapheight)) : ", x_degree_per_pixel,y_degree_per_pixel,salmap)
+
+        for x in range(mapwidth):
+            for y in range(mapheight):
+                cur_lon = x * x_degree_per_pixel - 180.0
+                cur_lat = y * y_degree_per_pixel - 90.0
+
+                for fixation_count in range(fixation_total):
+                    cur_fixation_lon = np.int(fixation[fixation_count][0])
+                    cur_fixation_lat = np.int(fixation[fixation_count][1])
+
+                    if (cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat):
+                        # print("<<<<<<<<<<<<<<<<<<<<<<<  sample[x,y]: ", salmap[x,y])
+                        salmap[x,y] = salmap[x,y] + 1
+                        i += 1
+                        if(salmap[x,y] == 2):
+                            print(">>>>>>>>>>>>>>>>>>>>>>>>x,y,salmap[x, y],i: ",x,y,salmap[x,y],i)
+
+        # salmap[cur_lon+180,cur_lat+90] = salmap[x,y] #dont use this line code
+
+        # salmap = salmap * ( 1.0 / np.amax(salmap) )
+        # for x in range(mapwidth):
+        #     for y in range(mapheight):
+        #         if salmap[x,y] > 0 :
+        #             # print("x,y,[x,y]: ",x,y,salmap[x,y])
+        # print(">>>>>>>>>>>>>> np.shape(sample): ", np.shape(salmap))
+        salmap = np.transpose(salmap) # samle.T
+
+        return salmap
 
     def fixation2salmap_sp_my_sigma(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
         fixation_total = np.shape(fixation)[0]
@@ -1095,50 +1206,11 @@ class env_li():
                     distance_to_cur_fixation = distance_to_cur_fixation / math.pi * 180.0
                     sal = math.exp(-1.0 / 2.0 * (distance_to_cur_fixation**2) / (my_sigma**2))
                     salmap[x, y] += sal
-        salmap = salmap * ( 1.0 / np.amax(salmap) )
+        salmap = salmap * (1.0 / np.amax(salmap))
         salmap = np.transpose(salmap)
         return salmap
 
-    def fixation2salmap_for_nss(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
-        fixation_total = np.shape(fixation)[0]
-        # print(">>>>>>>>>>>>>>fixation_total = np.shape(fixation)[0]: ", fixation_total)# = 58
-        x_degree_per_pixel = 360.0 / mapwidth
-        y_degree_per_pixel = 180.0 / mapheight
-        salmap = np.zeros((mapwidth, mapheight))
-        # print(">>>>>>>>>>>> x_degree_per_pixel,y_degree_per_pixel,salmap = np.zeros((mapwidth, mapheight)) : ", x_degree_per_pixel,y_degree_per_pixel,salmap)
-        for x in range(mapwidth):
-            for y in range(mapheight):
-                cur_lon = x * x_degree_per_pixel - 180.0
-                cur_lat = y * y_degree_per_pixel - 90.0
-                for fixation_count in range(fixation_total):
-                    cur_fixation_lon = np.int(fixation[fixation_count][0])
-                    cur_fixation_lat = np.int(fixation[fixation_count][1])
-                    # # print(">>>> cur_fixation_lon ,cur_fixation_lat: ",cur_fixation_lon ,cur_fixation_lat)
-                    # distance_to_cur_fixation = haversine(lon1=cur_lon,
-                    #                                      lat1=cur_lat,
-                    #                                      lon2=cur_fixation_lon,
-                    #                                      lat2=cur_fixation_lat)
-                    # # print(">>>>>>>> distance_to_cur_fixation: ",distance_to_cur_fixation) # return a single value
-                    # distance_to_cur_fixation = distance_to_cur_fixation / math.pi * 180.0
-                    # sal = math.exp(-1.0 / 2.0 * (distance_to_cur_fixation**2) / (my_sigma**2))
-                    # # print(">>>>>>>>>>>>>>>>>>> (sal): ", (sal)) # A SINGLE VALUE
-                    # salmap[x, y] += sal
-                    # if cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat:
-                    #     salmap[x, y] = 1
-                    #     print("x,y: ",x,y)
-                    # else:
-                    #     salmap[x,y] = 0
-                    salmap[cur_fixation_lon+180,cur_fixation_lat+90] = 1
 
-        salmap = salmap * ( 1.0 / np.amax(salmap) )
-        # for x in range(mapwidth):
-        #     for y in range(mapheight):
-        #         if salmap[x,y] > 0 :
-        #             # print("x,y,[x,y]: ",x,y,salmap[x,y])
-        # print(">>>>>>>>>>>>>> np.shape(sample): ", np.shape(salmap))
-        salmap = np.transpose(salmap)# samle.T
-        # print(">>>>>>>>>>>> np.shape(salmap = np.transpose(salmap)): ", np.shape(salmap))
-        return salmap
 
     def log_thread_config(self):
 
@@ -1492,6 +1564,13 @@ class env_li():
 
     def save_heatmap(self,heatmap,path,name):
         heatmap = heatmap * 255.0
+        # cv2.imwrite(path+'/'+name+'.jpg',heatmap)
+        # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
+        cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
+        # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
+
+    def save_heatmap_for_nss(self,heatmap,path,name):
+        heatmap = heatmap
         # cv2.imwrite(path+'/'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
         cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)

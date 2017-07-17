@@ -235,22 +235,32 @@ def calc_score_nss(gtsAnn, resAnn):
     :param resAnn : predicted saliency map
     :return score: int : NSS score
     """
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> calc_score_nss start >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    print("np.shape(gtsAnn),np.shape(resAnn): ",np.shape(gtsAnn),np.shape(resAnn))
 
     salMap = resAnn - np.mean(resAnn)
     ave_ss = []
+    N_Locations = 0
     # if np.max(salMap) > 0:
     salMap = salMap / np.std(salMap)
-    print(np.max(salMap))
-
+    # print("np.max(salMap): ", np.max(salMap))
     # print("np.shape(salMap),np.shape(gtsAnn): ", np.shape(salMap), np.shape(gtsAnn))
-
+    i1 = 0
     for x in range(180):
         for y in range(360):
-            if gtsAnn[x][y] > 0:
-                ave_ss.append(salMap[x][y])
-                # print("ave_ss.append(salMap[x][y]):",x,y,salMap[x][y])
+            if( gtsAnn[x][y] > 0):
+                i1 = i1 +1
+                print("gtsAnn[x][y], i:", gtsAnn[x][y],i1)
 
-    ave_ss = np.mean(ave_ss)
+    # for x in range(180):
+    #     for y in range(360):
+    #         if gtsAnn[x][y] > 0:
+    #             ave_ss.append(salMap[x][y]*gtsAnn[x][y])
+    #             N_Locations += gtsAnn[x][y]
+    #             # print("ave_ss.append(salMap[x][y]):",x,y,salMap[x][y])
+    # print("N_Locations: ",N_Locations)
+    # N_Locations = np.float32(N_Locations)
+    # ave_ss = ave_ss/N_Locations
 
     # np.mean([ salMap[x][y] for y,x in gtsAnn])
 
