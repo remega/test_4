@@ -10,21 +10,25 @@ elif project is 'f':
         if_off_line_debug = False
     if mode is 'on_line':
         if_on_line_debug = False
-    elif mode is 'data_processor':
+    elif mode is 'data_processor': # bing0
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_mp4_to_yuv'
-     # availible:minglang_mp4_to_yuv,compute_consi,minglang_mp4_to_jpg
+        data_processor_id = 'minglang_get_ours_groundhp_ss_cc'
+########################################## get the heatmap for calculate#######################################
+     # availible:minglang_mp4_to_yuv
+     #  compute_consi,minglang_mp4_to_jpg
      # minglang_obdl_cfg,
      # minglang_get_ground_truth_heatmap
      # minglang_get_ground_truth_heatmap_for_nss
      # minglang_avi_to_jpg
      # ming_fcb_cc,
-     # minglang_get_bms_groundhp_cc
-     # minglang_get_ours_groundhp_cc
      # minglang_get_fcb
+####################################### get the cc and ss ##################################################
+     # minglang_get_bms_groundhp_cc
+     # minglang_get_ours_groundhp_ss_cc
      # minglang_get_bms_groundhp_cc
      # minglang_get_obdl_groundhp_cc
      # minglang_get_salicon_groundhp_ss
+
 '''log config'''
 if mode is 'off_line':
     if if_off_line_debug is True:
@@ -311,7 +315,7 @@ elif project is 'f':
         elif data_base is 'vr_new':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
-            #ming here debug
+            #bing1
             # game_dic = game_dic[10:20]
             game_dic = f_game_dic_new_test[0:1] # for test the cc
 

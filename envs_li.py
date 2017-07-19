@@ -394,13 +394,12 @@ class env_li():
             self.save_gt_heatmaps()
             print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
-        # get and save groundtruth_heatmap
+        # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
-
-            print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss <<<<<<<<<<<<<<<<<<<<<<<<<')
-            # print(dsnfj)
-            self.save_gt_groundtruth_heatmaps_for_nss()
-            print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end<<<<<<<<<<<<<<<<<<<<<<<<<')
+            print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss start')
+            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = True,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+            # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = True,nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+            print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end')
 
 
         # get and save fcb_heatmap
@@ -452,26 +451,33 @@ class env_li():
             self.cc_averaged = sum(ccs)/len(ccs)
             self.save_ave_cc(self.cc_averaged,
                                     path = '/home/minglang/PAMI/cc_result/FCB_and_ground/ave_cc/')
-
             print("cc average "+str(self.cc_averaged))
 
-        # minglang_get_ours_groundhp_cc
-        if data_processor_id is 'minglang_get_ours_groundhp_cc':
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_cc start<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+        # minglang_get_ours_groundhp_cc,now1
+        if data_processor_id is 'minglang_get_ours_groundhp_ss_cc':
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss_cc star<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            ###################### get the heatmap #########################
             # self.save_ours_heatmap()
+            #####################  cal the CC  ############################
             # self.cal_ours_ground_cc()
             ############################### cal nss #########################################
-            with_fcb = True # True Flase
+            with_fcb = False # True Flase
             if with_fcb is True:
-                self.cal_nss(src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_with_fcb/',
+                self.cal_nss(
+                        Multi_255 = False,
+                        ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
+                        prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_with_fcb/',
                         dst_all_ss_path ='/home/minglang/PAMI/ss_result /ours_and_ground/ss_all_steps_with_fcb/' ,
                         dst_ave_ss_path ='/home/minglang/PAMI/ss_result /ours_and_ground/ave_ss_with_fcb/')
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss with_fcb end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             else:
-                self.cal_nss(src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb /',
+                self.cal_nss(
+                        Multi_255 = False,
+                        ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
+                        prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb /',
                         dst_all_ss_path ='/home/minglang/PAMI/ss_result /ours_and_ground/ss_all_steps/' ,
                         dst_ave_ss_path ='/home/minglang/PAMI/ss_result /ours_and_ground/ave_ss/')
-                print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss without_fcb end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # minglang_get_bms_groundtruh
         if data_processor_id is 'minglang_get_bms_groundhp_cc':
@@ -544,8 +550,8 @@ class env_li():
                             dst_all_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ss_all_with_fcb/' ,
                             dst_ave_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ave_ss_with_fcb/')
 
-
-        print('=============================data process end, asfsa,programe terminate=============================')
+        '''terminate the dataprocesor'''
+        print('=============================data processor end, terminate=============================')
         print(t)
 
 
@@ -621,44 +627,42 @@ class env_li():
         print("cc average "+str(self.cc_averaged))
         print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
-    def cal_nss(self,src_path, dst_all_ss_path,dst_ave_ss_path):
-
+    # nows(for location here quickly)
+    def cal_nss(self,Multi_255,ground_src_path, prediction_src_path, dst_all_ss_path,dst_ave_ss_path):
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>cal nss begin<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         ccs = []
         fcb_maps = []
+        " get the groundtruth hmap "
+        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = prediction_src_path) #load ours heatmap
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>cal_nss self.gt_heatmaps_ours end: ")
+        " get the prediction hmap "
+        if Multi_255 is True:
+            ''' notice that this function has /255.0 to the map '''
+            self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = True,nss_cc = True, groundtruth_path = ground_src_path) #load ground-truth heatmap
+        else:
+            ''' notice that this function keep the raw value the map '''
+            self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = False,nss_cc = True, groundtruth_path = ground_src_path) #load ground-truth heatmap
 
-        self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = src_path) #load ours heatmap
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>cal_nss self.gt_heatmaps_ours end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(nss_cc = True) #load ground-truth heatmap
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.gt_heatmaps_groundtruth end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.gt_heatmaps_groundtruth end: ")
 
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
-            print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
-            # self.save_heatmap(heatmap=fcb_map,
-            #                   path='/home/minglang/PAMI/fcb_err',
-            #                   name=str(self.env_id))
+            # print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
             cc = self.calc_score_nss(gtsAnn = self.gt_heatmaps_groundtruth[step], resAnn =  self.gt_heatmaps_ours[step])
-            gtsAnn = self.gt_heatmaps_groundtruth[step]
-            resAnn =  self.gt_heatmaps_ours[step]
-            print("np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn", np.shape(gtsAnn), np.shape(resAnn),gtsAnn, resAnn)
-            print('>>>>>>ss = self.calc_score_nss: ',cc)
-            print(step)
+            print('>>>>>>>>>>>>>>>def cal_nss,step, ss: ',step, cc)
             self.save_step_cc(cc=cc,
                               step=step,
                               path = dst_all_ss_path)
-            if(step > 0):
-              ccs += [cc]
+            ''' ignore the negative result in order to improve the cc '''
+            # if(step > 0):
+            ccs += [cc]
 
-        print("here right")
-            # print(sfd)
         self.cc_averaged = sum(ccs)/len(ccs)
         self.save_ave_cc(self.cc_averaged,
                          path = dst_ave_ss_path)
-        print("cc average "+str(self.cc_averaged))
-        print('>>>>>>>>>>>>>>>>>>>>cal_ss_end<<<<<<<<<<<<<<<<<<<<<<<<<')
-
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>def cal_nss,cc average  "+str(self.cc_averaged))
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>cal nss end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
     def save_ours_heatmap(self):
         heatmaps = []
@@ -980,7 +984,7 @@ class env_li():
                 #for our's hmap
                 # file_name = '/home/minglang/PAMI/ff_best_heatmaps_ours/'+str(self.env_id)+'/'+str(step)+'.jpg'
                 file_name = source_path + str(self.env_id)+'_'+str(step)+'.jpg'
-                print(">>>>>>>>>>>>>>load_gt_heatmaps----self.env_id-----print step: ",self.env_id,step)
+                print(">>>>>>>>>>>>>>>>>def load_gt_heatmaps: self.env_id, step: ",self.env_id,step)
                 temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
                 temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
                 temp = temp / 255.0
@@ -992,24 +996,26 @@ class env_li():
 
         return heatmaps
 
-    def load_gt_heatmaps_groundtruth(self,nss_cc = True):
+    def load_gt_heatmaps_groundtruth(self,Multi_255 = False, nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/'):
+        '''the nss_cc for remind you choose cc_heatmap or nss_heatmap '''
+        if nss_cc is True:
+            print(">>>>>>>>def load_gt_heatmaps_groundtruth: set to cc path: ", groundtruth_path)
+        else:
+            print(">>>>>>>>def load_gt_heatmaps_groundtruth: set to nss path: ", groundtruth_path)
+
         heatmaps = []
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
 
             try:
-                #for ground-truth's hmap
-                if nss_cc is True:
-                    file_name = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss/'+self.env_id+'_'+str(step)+'.jpg'
-                else:
-                    file_name = '/home/minglang/PAMI/test_file/ground_truth_hmap/'+self.env_id+'_'+str(step)+'.jpg'
-                print(">>>>>>>>>>>>>>>>>>>>>>>>>load_gt_heatmaps_groundtruth_print step: ",step)
+                file_name = groundtruth_path +self.env_id+'_'+str(step)+'.jpg'
                 temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
                 temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
-                temp = temp / 255.0
+                if Multi_255 is True:
+                    temp = temp / 255.0
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: Multi_255,step,np.max(temp)",Multi_255,step,np.max(temp))
                 heatmaps += [temp]
-                print(np.shape(heatmaps))
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1044,12 +1050,7 @@ class env_li():
                 continue
         print(s)
 
-    def save_gt_groundtruth_heatmaps_for_nss(self):
-        print('save_gt_heatmaps')
-
-        '''for fixation'''
-        # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
-        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))*0.5#cc is large .chose half of sigma
+    def save_gt_groundtruth_heatmaps_for_nss(self,Multi_255 = True,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/'):
         groundtruth_heatmaps=[]
         for step in range(self.step_total):
             data = int(round((step)*self.data_per_step))
@@ -1058,23 +1059,43 @@ class env_li():
                 groundtruth_fixation = np.zeros((self.subjects_total, 2))
                 for subject in range(self.subjects_total):
                     # print("self.subjects_total: ",self.subjects_total) # = 58
-                    # print(s_qiao)
+                    # tow single value
                     groundtruth_fixation[subject, 0] = self.subjects[subject].data_frame[data].p[0]
                     groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
-                    # tow single value
-                    # print(">>>>>>>>>: np.shape(groundtruth_fixation[subject, 0]), np.shape(groundtruth_fixation[subject, 1]): ",groundtruth_fixation[subject, 0], groundtruth_fixation[subject, 1])
-                    # print("np.shape(groundtruth_fixation): ", np.shape(groundtruth_fixation)) # = (58,2)
-                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height, my_sigma = sigma)
-                self.save_heatmap(heatmap=groundtruth_heatmap,
-                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss/',
-                                  name=str(step))
-                groundtruth_heatmaps += [groundtruth_heatmap]
-                print("np.shape(groundtruth_heatmaps): ", np.shape(groundtruth_heatmaps))
+                "fix one step's data of 56 subjects"
+                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = True)
+                # this function X255 to the heatmap depend on the paramiter Multi255
+                self.save_heatmap_for_nss(heatmap = groundtruth_heatmap,
+                                  path = save_path,
+                                  name = str(step),
+                                  Multi_255 = Multi_255)
+                print("def save_gt_groundtruth_heatmaps_for_nss: step,Multi_255 ", step,Multi_255)
             except Exception,e:
                 print Exception,":",e
                 continue
-            # print(s)
         print(s)
+
+    def fixation2salmap_for_nss(self,fixation, mapwidth, mapheight,normal = False):
+        fixation_total = np.shape(fixation)[0] # fixation_total) = 58
+        x_degree_per_pixel = 360.0 / mapwidth
+        y_degree_per_pixel = 180.0 / mapheight
+        salmap = np.zeros((mapwidth, mapheight))
+
+        for x in range(mapwidth):
+            for y in range(mapheight):
+                cur_lon = x * x_degree_per_pixel - 180.0
+                cur_lat = y * y_degree_per_pixel - 90.0
+                for fixation_count in range(fixation_total):
+                    cur_fixation_lon = np.int(fixation[fixation_count][0])
+                    cur_fixation_lat = np.int(fixation[fixation_count][1])
+                    if cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat:
+                        salmap[x, y] += 1
+                        if salmap[x, y] > 1:
+                            print(">>>>>>>>>>>>>>>>>def fixation2salmap_for_nss,x,y,salmap[x, y]: ",x,y,salmap[x, y])
+        if normal is True:
+            salmap = salmap * ( 1.0 / np.amax(salmap) )
+        salmap = np.transpose(salmap)# samle.T
+        return salmap
 
     def fixation2salmap_sp_my_sigma(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
         fixation_total = np.shape(fixation)[0]
@@ -1099,46 +1120,7 @@ class env_li():
         salmap = np.transpose(salmap)
         return salmap
 
-    def fixation2salmap_for_nss(self,fixation, mapwidth, mapheight, my_sigma = (11.75+13.78)/2):
-        fixation_total = np.shape(fixation)[0]
-        # print(">>>>>>>>>>>>>>fixation_total = np.shape(fixation)[0]: ", fixation_total)# = 58
-        x_degree_per_pixel = 360.0 / mapwidth
-        y_degree_per_pixel = 180.0 / mapheight
-        salmap = np.zeros((mapwidth, mapheight))
-        # print(">>>>>>>>>>>> x_degree_per_pixel,y_degree_per_pixel,salmap = np.zeros((mapwidth, mapheight)) : ", x_degree_per_pixel,y_degree_per_pixel,salmap)
-        for x in range(mapwidth):
-            for y in range(mapheight):
-                cur_lon = x * x_degree_per_pixel - 180.0
-                cur_lat = y * y_degree_per_pixel - 90.0
-                for fixation_count in range(fixation_total):
-                    cur_fixation_lon = np.int(fixation[fixation_count][0])
-                    cur_fixation_lat = np.int(fixation[fixation_count][1])
-                    # # print(">>>> cur_fixation_lon ,cur_fixation_lat: ",cur_fixation_lon ,cur_fixation_lat)
-                    # distance_to_cur_fixation = haversine(lon1=cur_lon,
-                    #                                      lat1=cur_lat,
-                    #                                      lon2=cur_fixation_lon,
-                    #                                      lat2=cur_fixation_lat)
-                    # # print(">>>>>>>> distance_to_cur_fixation: ",distance_to_cur_fixation) # return a single value
-                    # distance_to_cur_fixation = distance_to_cur_fixation / math.pi * 180.0
-                    # sal = math.exp(-1.0 / 2.0 * (distance_to_cur_fixation**2) / (my_sigma**2))
-                    # # print(">>>>>>>>>>>>>>>>>>> (sal): ", (sal)) # A SINGLE VALUE
-                    # salmap[x, y] += sal
-                    # if cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat:
-                    #     salmap[x, y] = 1
-                    #     print("x,y: ",x,y)
-                    # else:
-                    #     salmap[x,y] = 0
-                    salmap[cur_fixation_lon+180,cur_fixation_lat+90] = 1
 
-        salmap = salmap * ( 1.0 / np.amax(salmap) )
-        # for x in range(mapwidth):
-        #     for y in range(mapheight):
-        #         if salmap[x,y] > 0 :
-        #             # print("x,y,[x,y]: ",x,y,salmap[x,y])
-        # print(">>>>>>>>>>>>>> np.shape(sample): ", np.shape(salmap))
-        salmap = np.transpose(salmap)# samle.T
-        # print(">>>>>>>>>>>> np.shape(salmap = np.transpose(salmap)): ", np.shape(salmap))
-        return salmap
 
     def log_thread_config(self):
 
@@ -1496,3 +1478,8 @@ class env_li():
         # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
         cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
+
+    def save_heatmap_for_nss(self,heatmap,path,name,Multi_255 = False):
+       if Multi_255 is True:
+           heatmap = heatmap * 255.0
+       cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)

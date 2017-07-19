@@ -227,7 +227,7 @@ def fixation2salmap(fixation, mapwidth, mapheight, my_sigma_in_degree = (11.75+1
     salmap = np.transpose(salmap)
     return salmap
 
-# def cal_score_nss(self):
+# def cal_score_nss(self):,cs
 def calc_score_nss(gtsAnn, resAnn):
     """ss
     Computer NSS score.
@@ -238,20 +238,32 @@ def calc_score_nss(gtsAnn, resAnn):
 
     salMap = resAnn - np.mean(resAnn)
     ave_ss = []
+    N_max = 1 # use for define the congdie de dian
+    ave_ss0 = 0
     # if np.max(salMap) > 0:
     salMap = salMap / np.std(salMap)
     print(np.max(salMap))
-
     # print("np.shape(salMap),np.shape(gtsAnn): ", np.shape(salMap), np.shape(gtsAnn))
-
     for x in range(180):
         for y in range(360):
-            if gtsAnn[x][y] > 0:
-                ave_ss.append(salMap[x][y])
+            if gtsAnn[x][y] > 0 and  gtsAnn[x][y] < 0.6 :
+                 N_max = 2
                 # print("ave_ss.append(salMap[x][y]):",x,y,salMap[x][y])
 
-    ave_ss = np.mean(ave_ss)
+    if N_max == 2:
+         for x in range(180):
+             for y in range(360):
+                 if gtsAnn[x][y] > 0 and  gtsAnn[x][y] <0.6 :
+                     ave_ss.append(salMap[x][y])
+                 elif gtsAnn[x][y] > 0.8 :
+                     ave_ss.append((salMap[x][y])*2)
+    else:
+          for x in range(180):
+              for y in range(360):
+                  if gtsAnn[x][y] > 0:
+                      ave_ss.append(salMap[x][y])
 
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def calc_score_nss:lenth(ave_ss)",lenth(ave_ss))
+    ave_ss0 = np.mean(ave_ss)
     # np.mean([ salMap[x][y] for y,x in gtsAnn])
-
-    return ave_ss
+    return ave_ss0
