@@ -397,7 +397,8 @@ class env_li():
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss start')
-            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = False,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+            # self.test_save()
+            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = False,save_path = '/home/minglang/test_code/')
             # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = False,nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end')
 
@@ -1066,12 +1067,13 @@ class env_li():
                 "fix one step's data of 56 subjects"
                 groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = False)
                 # this function X255 to the heatmap depend on the paramiter Multi255
+                # debug01
                 self.save_heatmap_for_nss(
                                   heatmap = groundtruth_heatmap,
                                   path = save_path,
                                   name = str(step),
                                   Multi_255 = Multi_255)
-                print("def save_gt_groundtruth_heatmaps_for_nss: step,Multi_255,np.max(groundtruth_heatmap) ", step,Multi_255, np.max(groundtruth_heatmap))
+                print("def save_gt_groundtruth_heatmaps_for_nss: step,Multi_255,np.max(groundtruth_heatmap) ", step, Multi_255, np.max(groundtruth_heatmap))
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1091,15 +1093,14 @@ class env_li():
                     cur_fixation_lon = round(fixation[fixation_count][0])
                     cur_fixation_lat = round(fixation[fixation_count][1])
                     if cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat:
-                        salmap[x, y] = int(salmap[x, y]) + 1
+                        salmap[x, y] = salmap[x, y] + 1
                         if salmap[x, y] > 1:
-                            print(">>>>>>>>>>>>>>>>>def fixation2salmap_for_nss,x,y,salmap[x, y]: ",x,y,salmap[x, y])
+                            print(">>>>>>>>>>>>>>>>>def fixation2salmap_for_nss: x,y,salmap[x, y]: ",x,y,salmap[x, y])
                     "for debug"
                     # if y >160:
                     #     salmap[x, y] = 255
         # if normal is True:
         #     salmap = salmap * ( 1.0 / np.amax(salmap) )
-        salmap = salmap + 250
         salmap = np.transpose(salmap)# samle.T
         return salmap
 
@@ -1489,4 +1490,60 @@ class env_li():
        if Multi_255 is True:
            heatmap = heatmap * 255.0
        cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
-       print("def save_heatmap_for_nss: np.max(heatmap)", np.max(heatmap))
+    #    print(">>>>>>>>>>>>>>>>>>>>>>>>def save_heatmap_for_nss: np.max(heatmap),np.shape(heatmap)", np.max(heatmap),np.shape(heatmap))
+       Image_read0 = cv2.imread(path+self.env_id+'_'+name+'.jpg', cv2.CV_LOAD_IMAGE_GRAYSCALE)
+       Image_read1 = cv2.resize(Image_read0,(360, 180))
+    #    print(">>>>>>>>>>>>>>>>>>>>>>>>def save_heatmap_for_nss: np.max(Image_read0),np.shape(Image_read0)", np.max(Image_read0),np.shape(Image_read0))
+       # for debug1
+       self.test_save(heatmap,name)
+
+    def test_save(self,heatmap,name):
+        "test the read image debug"
+        Image = np.zeros((360,180))
+        for x in range(360):
+            for y in range(60):
+                # print("x,y",x,y) # 359,179
+                Image[x][y] = 0
+
+        for x in range(360):
+            for y in range(60,180):
+            #   print("x1,y1",x,y) # 359,179
+              Image[x][y] = 0
+
+        for x in range(1):
+            for y in range(170,180):
+            #   print("x1,y1",x,y) # 359,179
+              Image[x][y] = 8.0
+
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def test_save(self,heatmap,name): np.shape(Image),np.shape(heatmap)",np.shape(Image),np.shape(heatmap))
+
+        path = '/home/minglang/test_code/'
+        # name = 't1'
+        # env_id = 'A1'
+        # Image = np.transpose(Image)
+        heatmap1 = Image
+        i = 0
+        # heatmap1 = np.transpose(heatmap) # samle.T
+        # for x in range(360):
+        #     for y  in range(180):
+        #         if heatmap1[x][y] > 0:
+        #             i += 1
+        #             print("i,x,y,heatmap[x][y]: ",i,x,y,heatmap1[x][y])
+
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def test_save(self,heatmap,name): np.shape(Image),np.shape(heatmap)",np.shape(Image),np.shape(heatmap))
+        file_name = path+self.env_id+'_'+name+'.jpg'
+        heatmap_width = 360
+        heatmap_height = 180
+
+        cv2.imwrite(file_name, heatmap1)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>. def test_save(self,heatmap,name):np.shape(heatmap1),np.max(heatmap1) ", np.shape(Image),np.max(heatmap1))
+        Image_read0 = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+        # Image_read1 = cv2.resize(Image_read0,(heatmap_width, heatmap_height))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  def test_save(self,heatmap):np.shape(Image_read0),np.max(Image_read0): ",np.shape(Image_read0),np.max(Image_read0))
+
+        for x in range(360):
+            for y in range(180):
+                if Image_read0[x][y] > 0:
+                    # i += Image_read0[x][y]
+                    i = i + 1
+                    print("i,x,y,Image_read0[x][y]: ",i,x,y,Image_read0[x][y])
