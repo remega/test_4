@@ -397,8 +397,8 @@ class env_li():
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss start')
-            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = True,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
-            # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = True,nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = False,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+            # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = False,nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end')
 
 
@@ -1004,17 +1004,18 @@ class env_li():
             print(">>>>>>>>def load_gt_heatmaps_groundtruth: set to nss path: ", groundtruth_path)
 
         heatmaps = []
-        for step in range(self.step_total-1):
+        for step in range(self.step_total):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
 
             try:
                 file_name = groundtruth_path +self.env_id+'_'+str(step)+'.jpg'
                 temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-                temp = cv2.resize(temp,(self.salmap_width, self.salmap_height))
-                if Multi_255 is True:
-                    temp = temp / 255.0
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: Multi_255,step,np.max(temp)",Multi_255,step,np.max(temp))
+                temp0 = cv2.resize(temp,(self.salmap_width, self.salmap_height))
+                if Multi_255 is True:
+                    temp0 = temp0 / 255.0
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: Multi_255,step,np.max(temp0)",Multi_255,step,np.max(temp0))
                 heatmaps += [temp]
             except Exception,e:
                 print Exception,":",e
@@ -1063,13 +1064,14 @@ class env_li():
                     groundtruth_fixation[subject, 0] = self.subjects[subject].data_frame[data].p[0]
                     groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
                 "fix one step's data of 56 subjects"
-                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = True)
+                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = False)
                 # this function X255 to the heatmap depend on the paramiter Multi255
-                self.save_heatmap_for_nss(heatmap = groundtruth_heatmap,
+                self.save_heatmap_for_nss(
+                                  heatmap = groundtruth_heatmap,
                                   path = save_path,
                                   name = str(step),
                                   Multi_255 = Multi_255)
-                print("def save_gt_groundtruth_heatmaps_for_nss: step,Multi_255 ", step,Multi_255)
+                print("def save_gt_groundtruth_heatmaps_for_nss: step,Multi_255,np.max(groundtruth_heatmap) ", step,Multi_255, np.max(groundtruth_heatmap))
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1086,14 +1088,18 @@ class env_li():
                 cur_lon = x * x_degree_per_pixel - 180.0
                 cur_lat = y * y_degree_per_pixel - 90.0
                 for fixation_count in range(fixation_total):
-                    cur_fixation_lon = np.int(fixation[fixation_count][0])
-                    cur_fixation_lat = np.int(fixation[fixation_count][1])
+                    cur_fixation_lon = round(fixation[fixation_count][0])
+                    cur_fixation_lat = round(fixation[fixation_count][1])
                     if cur_lon == cur_fixation_lon and cur_lat == cur_fixation_lat:
-                        salmap[x, y] += 1
+                        salmap[x, y] = int(salmap[x, y]) + 1
                         if salmap[x, y] > 1:
                             print(">>>>>>>>>>>>>>>>>def fixation2salmap_for_nss,x,y,salmap[x, y]: ",x,y,salmap[x, y])
-        if normal is True:
-            salmap = salmap * ( 1.0 / np.amax(salmap) )
+                    "for debug"
+                    # if y >160:
+                    #     salmap[x, y] = 255
+        # if normal is True:
+        #     salmap = salmap * ( 1.0 / np.amax(salmap) )
+        salmap = salmap + 250
         salmap = np.transpose(salmap)# samle.T
         return salmap
 
@@ -1483,3 +1489,4 @@ class env_li():
        if Multi_255 is True:
            heatmap = heatmap * 255.0
        cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
+       print("def save_heatmap_for_nss: np.max(heatmap)", np.max(heatmap))

@@ -12,7 +12,7 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor': # bing0
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_ours_groundhp_ss_cc'
+        data_processor_id = 'minglang_get_ground_truth_heatmap_for_nss'
 ########################################## get the heatmap for calculate#######################################
      # availible:minglang_mp4_to_yuv
      #  compute_consi,minglang_mp4_to_jpg
