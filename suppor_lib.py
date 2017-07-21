@@ -240,30 +240,17 @@ def calc_score_nss(gtsAnn, resAnn):
     ave_ss = []
     N_max = 1 # use for define the congdie de dian
     ave_ss0 = 0
-    # if np.max(salMap) > 0:
-    salMap = salMap / np.std(salMap)
-    print(np.max(salMap))
-    # print("np.shape(salMap),np.shape(gtsAnn): ", np.shape(salMap), np.shape(gtsAnn))
-    for x in range(180):
-        for y in range(360):
-            if gtsAnn[x][y] > 0 and  gtsAnn[x][y] < 0.6 :
-                 N_max = 2
-                # print("ave_ss.append(salMap[x][y]):",x,y,salMap[x][y])
-
-    if N_max == 2:
-         for x in range(180):
-             for y in range(360):
-                 if gtsAnn[x][y] > 0 and  gtsAnn[x][y] <0.6 :
-                     ave_ss.append(salMap[x][y])
-                 elif gtsAnn[x][y] > 0.8 :
-                     ave_ss.append((salMap[x][y])*2)
-    else:
-          for x in range(180):
-              for y in range(360):
-                  if gtsAnn[x][y] > 0:
-                      ave_ss.append(salMap[x][y])
-
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def calc_score_nss:lenth(ave_ss)",lenth(ave_ss))
-    ave_ss0 = np.mean(ave_ss)
-    # np.mean([ salMap[x][y] for y,x in gtsAnn])
+    i = 0
+    if(np.std(salMap) != 0):
+        # if np.max(salMap) > 0:
+        salMap = salMap / np.std(salMap)
+        print("np.shape(salMap),np.shape(gtsAnn): ", np.shape(salMap), np.shape(gtsAnn))
+        for x in range(180):
+            for y in range(360):
+                if gtsAnn[x][y] > 0:
+                    i += 1
+                    ave_ss.append(salMap[x][y] * gtsAnn[x][y])
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def calc_score_nss:i",i)
+        ave_ss0 = np.sum(ave_ss) * 1.0 / i
+        # np.mean([ salMap[x][y] for y,x in gtsAnn])
     return ave_ss0
