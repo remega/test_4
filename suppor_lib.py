@@ -250,7 +250,8 @@ def calc_score_nss(gtsAnn, resAnn):
                 if gtsAnn[x][y] > 0:
                     i += 1
                     ave_ss.append(salMap[x][y] * gtsAnn[x][y])
+                    print(">>>>>>>>>>>>>>>>>>>>>>>> def calc_score_nss(gtsAnn, resAnn): gtsAnn[x][y]: ", gtsAnn[x][y])
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def calc_score_nss:i",i)
-        ave_ss0 = np.sum(ave_ss) * 1.0 / i
+        ave_ss0 = np.sum(ave_ss) * 1.0 / 58.0
         # np.mean([ salMap[x][y] for y,x in gtsAnn])
     return ave_ss0
