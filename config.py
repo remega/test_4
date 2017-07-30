@@ -12,11 +12,12 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor': # bing0
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_fcb_groundhp_ss_cc'
-########################################## get the heatmap for calculate#######################################
+        data_processor_id = 'minglang_get_ground_truth_heatmap'
+########################################## minglang_mp4_to_jpg#######################################
      # availible:minglang_mp4_to_yuv
-     #  compute_consi,minglang_mp4_to_jpg
-     # minglang_obdl_cfg,
+     # compute_consi
+     # minglang_mp4_to_jpg
+     # minglang_obdl_cfg
      # minglang_get_ground_truth_heatmap
      # minglang_get_ground_truth_heatmap_for_nss
      # minglang_avi_to_jpg
@@ -27,6 +28,8 @@ elif project is 'f':
      # minglang_get_obdl_groundhp_ss_cc
      # minglang_get_salicon_groundhp_ss_cc
      # minglang_get_fcb_groundhp_ss_cc
+############################################## HM curve ###########################################################
+     # subjects_scanpath_curve
 
 '''log config'''
 if mode is 'off_line':
@@ -315,8 +318,8 @@ elif project is 'f':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
             #bing1
-            # game_dic = game_dic[10:20]
-            game_dic = f_game_dic_new_test[0:15] # for test the cc
+            game_dic = game_dic[0:1]
+            # game_dic = f_game_dic_new_test[0:1] # for test the cc
 
 '''default config'''
 

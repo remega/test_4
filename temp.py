@@ -1,12 +1,13 @@
-import numpy as np
-import math
+import random
 
-# a = [[1,2,3],[4,5,6]]
-# b = a[0][1]
-# c = a[0,1]
-a = [1,"nan",2,"nan"]
-for i in a:
-    if math.isnan(float(i)) is False:
-        print(i)
+count = -1
+val = []
+for i in range(0,58):
+    count += 1
+    val.append(count)
+val_A  = random.sample(val, 29)
+for i in val_A:
+    val.remove(i)
+val_B = val
 
-# print(a,b)
+print(val_A,val_B)

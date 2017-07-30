@@ -265,38 +265,40 @@ class env_li():
             # print(game_dic_new_all)
 
         if data_processor_id is 'minglang_mp4_to_jpg':
-            from config import f_game_dic_new_test
+            # from config import f_game_dic_new_test
             # for i in range(len(f_game_dic_new_test)):
             # print(game_dic_new_all[i])
-            i = 0
-            # if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
-                # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+str(game_dic_new_all[i])+'.mp4'
-                # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
-                # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
-            file_in_1 = '/media/minglang/My Passport/vedio_ice/out/'+self.env_id+'.mp4'
-            print('minglang/YuhangSong')
-            # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(f_game_dic_new_test[i])+'.jpg'
-
-            video = cv2.VideoCapture(file_in_1)
-            self.video = video
-            self.frame_per_second = round(video.get(cv2.cv.CV_CAP_PROP_FPS))
-            self.frame_total = round(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-
-            for frame_i in range(int(self.frame_total)):
-
-                try:
-                    rval, frame = self.video.read()
-                    # frame = cv2.resize(frame,(self.salmap_width, self.salmap_height))
-                    # here minglang 1
-                    # cv2.imwrite('/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(game_dic_new_all[i])+'_'+str(frame_i)+'.jpg',frame)
-                    cv2.imwrite('/media/minglang/My Passport/vedio_ice/out_image/'+self.env_id+'_'+str(frame_i)+'.jpg',frame)
-                    print(frame_i)
-                except Exception, e:
-                    print('failed on this frame, continue')
-                    print Exception,":",e
-                    continue
-
-                    print('end processing: ',file_in_1,self.frame_per_second,self.frame_total)
+            # i = 0
+            # # if i >= 0 and i <= len(f_game_dic_new_test): #len(game_dic_new_all)
+            # file_in_1 = '/home/minglang/PAMI/test_video/'+self.env_id+'.mp4'
+            #     # file_out_1 = '/media/minglang/YuhangSong_1/ff/vr_yuv/'+"Let'sNotBeAloneTonight"+'.yuv'
+            #     # file_in_1 = '/media/minglang/YuhangSong_1/ff/vr_new/'+"Let'sNotBeAloneTonight"+'.mp4'
+            # print('minglang/YuhangSong')
+            # # file_out_1 = '/home/minglang/PAMI/test_video/frames/'+self.env_id+'.jpg'
+            #
+            # video = cv2.VideoCapture(file_in_1)
+            # self.video = video
+            # self.frame_per_second = round(video.get(cv2.cv.CV_CAP_PROP_FPS))
+            # self.frame_total = round(video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+            # print("self.frame_total,self.frame_per_second",self.frame_total,self.frame_per_second)
+            #
+            # for frame_i in range(int(self.frame_total)):
+            #     try:
+            #         rval, frame = self.video.read()
+            #         # frame = cv2.resize(frame,(self.salmap_width, self.salmap_height))
+            #         # here minglang 1
+            #         # cv2.imwrite('/media/minglang/YuhangSong_1/ff/vr_bms_jpg/'+str(game_dic_new_all[i])+'_'+str(frame_i)+'.jpg',frame)
+            #         cv2.imwrite('/home/minglang/PAMI/test_video/frames_steps/'+self.env_id+'_'+str(frame_i)+'.jpg',frame)
+            #         print(frame_i)
+            #     except Exception, e:
+            #         print('failed on this frame, continue')
+            #         print Exception,":",e
+            #         continue
+            #
+            #         print('end processing: ',file_in_1,self.frame_per_second,self.frame_total)
+            ###############################get test video steps ###############################
+            self.save_test_step_frames( source_path1 = '/home/minglang/PAMI/test_video/frames/',
+                                        dest_path1 = '/home/minglang/PAMI/test_video/frames _steps/')
 
         if data_processor_id is 'minglang_avi_to_jpg':
             from config import f_game_dic_new_test
@@ -391,7 +393,16 @@ class env_li():
 
             print('>>>>>>>>>>>>>>>>>>>>minglang_get_ground_truth_heatmap<<<<<<<<<<<<<<<<<<<<<<<<<')
             # print(dsnfj)
-            self.save_gt_heatmaps()
+            # self.save_gt_heatmaps()
+            # self.save_gt_heatmaps_for_haoceng(
+            #                                   path_A = '/media/minglang/Data0/PAMI/Haochen/HA/',
+            #                                   path_B = '/media/minglang/Data0/PAMI/Haochen/HB/'
+            #                                  )
+            self.cal_cc(
+                    ground_src_path = '/media/minglang/Data0/PAMI/Haochen/HA/',
+                    prediction_src_path = '/media/minglang/Data0/PAMI/Haochen/HB/',
+                    dst_all_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/step_all/',
+                    dst_ave_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/ave/')
             print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # get and save groundtruth_heatmap,now0
@@ -618,6 +629,12 @@ class env_li():
             #                 dst_all_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ss_all_with_fcb/' ,
             #                 dst_ave_ss_path = '/home/minglang/PAMI/ss_result /salicon_and_ground /ave_ss_with_fcb/')
 
+        # subjects_scanpath_curve,nowc
+        if data_processor_id is 'subjects_scanpath_curve':
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ssubjects_scanpath_curve_begin<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+
+
         '''terminate the dataprocesor'''
         print('=============================data processor end, terminate=============================')
         print(t)
@@ -682,7 +699,11 @@ class env_li():
                 # if(step > 0):
                 ccs += [cc]
         self.cc_averaged = sum(ccs)/len(ccs)
-        self.save_ave_cc(self.cc_averaged,
+        #for Haochen_std_cc,nowh
+        print('>>>>>>>>>>>np.shape(ccs): ',np.shape(ccs))
+        self.std_cc = np.std(ccs)
+        self.save_ave_cc(ave_cc = self.cc_averaged,
+                         std_cc = self.std_cc,
                          path = dst_ave_cc_path)
         print("cc average "+str(self.cc_averaged))
         print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
@@ -777,7 +798,6 @@ class env_li():
                     self.save_heatmap(heatmap=heatmap,
                                       path='/home/minglang/PAMI/obdl_out/obdl_steps_with_fcb/',
                                       name=str(step))
-
                 heatmaps += [heatmap]
                 print(np.shape(heatmaps))
             except Exception,e:
@@ -940,6 +960,23 @@ class env_li():
                 continue
         print(s)
 
+    def save_test_step_frames(self,source_path1, dest_path1):
+        print('save_step_heatmaps')
+        heatmaps=[]
+        for step in range(self.step_total):
+           data = int(round((step)*self.data_per_step))
+           frame = int(round((step)*self.frame_per_step))
+           try:
+               # file_name = '/home/minglang/PAMI/bms/output_efp/'+self.env_id+'_'+str(frame)+'.png'
+               file_name = source_path1+self.env_id+'_'+str(frame)+'.jpg'
+               # heatmap = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE) / 255.0 # max is not 255
+               heatmap = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_COLOR) # max is not 255
+               print(">>>>>>>>>>>>>>>>>>>.step: ", step)
+               cv2.imwrite(dest_path1+self.env_id+'_'+str(step)+'.jpg',heatmap)
+           except Exception,e:
+               print Exception,":",e
+               continue
+
     def fixation2salmap_fcb(self,fixation, mapwidth, mapheight):
         my_sigma_in_degree = (11.75+13.78)/2
         fixation_total = np.shape(fixation)[0]
@@ -993,22 +1030,21 @@ class env_li():
         return salmap
 
 
-    def save_ave_cc(self,ave_cc,path):
+    def save_ave_cc(self,ave_cc,std_cc,path):
         print("cc average "+str(self.cc_averaged))
         f = open(path+'ave_cc.txt','a')
         # f = open('cc_result/'+str(self.env_id)+'_cc_on_frame.txt','a')
         print_string = '\t'
-        # print_string += 'step' + '\t'
-        print_string += str(self.env_id) + '\t'+ '\t'
-        # print_string += 'ave_cc' + '\t'
+        print_string += str(self.env_id) + '\t'
         print_string += str(ave_cc) + '\t'
+        print_string += str(std_cc) + '\t'
         print_string += '\n'
         f.write(print_string)
         f.close()
 
     def save_step_cc(self,cc,step,path):
         print("cc for step "+str(step)+" is "+str(cc))
-        f = open(path+str(self.env_id)+'_cc_on_step.txt','a')
+        f = open(path+str(self.env_id)+'_cc_on_step.txt','w')
         print_string = '\t'
         print_string += 'step' + '\t'
         print_string += str(step) + '\t'
@@ -1123,6 +1159,64 @@ class env_li():
                                   name=str(step))
                 groundtruth_heatmaps += [groundtruth_heatmap]
                 print(np.shape(groundtruth_heatmaps))
+            except Exception,e:
+                print Exception,":",e
+                continue
+        print(s)
+
+    def save_gt_heatmaps_for_haoceng(self,path_A,path_B):
+        import random
+        print('save_gt_heatmaps')
+        '''for fixation'''
+        # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
+        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))*0.5#cc is large .chose half of sigma
+        groundtruth_heatmaps=[]
+
+        # random dive the subjects to tow groups
+        ################################## notice that this part code can only run once to produce random group ########################################################
+        # count = -1
+        # val = []
+        # for i in range(0,58):
+        #     count += 1
+        #     val.append(count)
+        # val_A  = random.sample(val, 29)
+        # for i in val_A:
+        #     val.remove(i)
+        # val_B = val
+        ##########################################################################################
+        val_A = [42, 53, 57, 27, 20, 40, 2, 24, 48, 22, 19, 41, 11, 49, 44, 36, 1, 5, 30, 25, 52, 38, 21, 39, 37, 32, 4, 0, 50]
+        val_B = [3, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 23, 26, 28, 29, 31, 33, 34, 35, 43, 45, 46, 47, 51, 54, 55, 56]
+        for step in range(self.step_total):
+            data = int(round((step)*self.data_per_step))
+            frame = int(round((step)*self.frame_per_step))
+            groundtruth_fixation_A = np.zeros((self.subjects_total/2, 2))
+            groundtruth_fixation_B = np.zeros((self.subjects_total/2, 2))
+            try:
+                groundtruth_fixation = np.zeros((self.subjects_total, 2))
+                for subject in range(self.subjects_total):
+                    # print("self.subjects_total: ",self.subjects_total)
+                    # print(s_qiao)
+                    groundtruth_fixation[subject, 0] = self.subjects[subject].data_frame[data].p[0]
+                    groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
+                for i in range(self.subjects_total/2):
+                    groundtruth_fixation_A[i,0] = (groundtruth_fixation[val_A[i],0])
+                    groundtruth_fixation_A[i,1] = (groundtruth_fixation[val_A[i],1])
+                for i in range(self.subjects_total/2):
+                    groundtruth_fixation_B[i,0] = (groundtruth_fixation[val_B[i],0])
+                    groundtruth_fixation_B[i,1] = (groundtruth_fixation[val_B[i],1])
+                print(">>>>>>>>>>>>>>>>>>>def save_gt_heatmaps_for_haoceng: step/step_total,np.shape(groundtruth_fixation): "\
+                , str(step)+'/'+str(self.step_total),np.shape(groundtruth_fixation),np.shape(groundtruth_fixation_A),np.shape(groundtruth_fixation_B))
+
+                groundtruth_heatmap_A = self.fixation2salmap_sp_my_sigma(groundtruth_fixation_A, self.salmap_width, self.salmap_height, my_sigma = sigma)
+                groundtruth_heatmap_B = self.fixation2salmap_sp_my_sigma(groundtruth_fixation_B, self.salmap_width, self.salmap_height, my_sigma = sigma)
+                self.save_heatmap(heatmap=groundtruth_heatmap_A,
+                                  path=path_A,
+                                  name=str(step))
+                self.save_heatmap(heatmap=groundtruth_heatmap_B,
+                                  path=path_B,
+                                  name=str(step))
+                # groundtruth_heatmaps += [groundtruth_heatmap]
+                # print(np.shape(groundtruth_heatmaps))
             except Exception,e:
                 print Exception,":",e
                 continue
