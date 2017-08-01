@@ -12,21 +12,21 @@ elif project is 'f':
         if_on_line_debug = False
     elif mode is 'data_processor': # bing0
         if_data_provessor_debug = True
-        data_processor_id = 'minglang_get_fcb_groundhp_ss_cc'
-########################################## get the heatmap for calculate#######################################
-     # availible:minglang_mp4_to_yuv
-     #  compute_consi,minglang_mp4_to_jpg
-     # minglang_obdl_cfg,
-     # minglang_get_ground_truth_heatmap
-     # minglang_get_ground_truth_heatmap_for_nss
-     # minglang_avi_to_jpg
-     # minglang_get_fcb
-####################################### get the cc and ss ##################################################
-     # minglang_get_ours_groundhp_ss_cc
-     # minglang_get_bms_groundhp_ss_cc
-     # minglang_get_obdl_groundhp_ss_cc
-     # minglang_get_salicon_groundhp_ss_cc
-     # minglang_get_fcb_groundhp_ss_cc
+        data_processor_mode = {  '1':'availible:minglang_mp4_to_yuv',
+                                 '2': 'compute_consi,minglang_mp4_to_jpg',
+                                 '3':'minglang_obdl_cfg',
+                                 '4': 'minglang_get_ground_truth_heatmap',
+                                 '5':'minglang_get_ground_truth_heatmap_for_nss',
+                                 '6':'minglang_avi_to_jpg',
+                                 '7': 'minglang_get_fcb',
+                                 ########################### get the cc and ss #########################
+                                 '8':'minglang_get_ours_groundhp_ss_cc',
+                                 '9':'minglang_get_bms_groundhp_ss_cc',
+                                 '10':'minglang_get_obdl_groundhp_ss_cc',
+                                 '11':'minglang_get_salicon_groundhp_ss_cc',
+                                 '12':'minglang_get_fcb_groundhp_ss_cc'
+                              }
+        data_processor_id = data_processor_mode['12']
 
 '''log config'''
 if mode is 'off_line':

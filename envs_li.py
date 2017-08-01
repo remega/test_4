@@ -3,6 +3,7 @@ import cv2
 from gym.spaces.box import Box
 import numpy as np
 import numpy
+import os
 import gym
 from gym import spaces
 import logging
@@ -415,7 +416,7 @@ class env_li():
                     max_temp = np.float32(np.max(temp))
                     temp = (temp/max_temp)
                     self.save_heatmap(heatmap = temp,
-                                      path = '/home/minglang/PAMI/fcb/',
+                                      path = '/home/minglang/PAMI/fcb/fcb_0.5/',
                                       name = str(step))
                 except Exception,e:
                     print Exception,":",e
@@ -427,18 +428,18 @@ class env_li():
         if data_processor_id is 'minglang_get_fcb_groundhp_ss_cc':
             # print('>>>>>>>>>>>>>>>>>>>>ming_fcb_SS_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
             ####################################### cal cc#################################################
-            self.cal_cc(
-                    ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
-                    prediction_src_path = '/home/minglang/PAMI/fcb/',
-                    dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all/',
-                    dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc/')
+            # self.cal_cc(
+            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
+            #         prediction_src_path = '/home/minglang/PAMI/fcb/fcb_1.5/',
+            #         dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all_1.5/',
+            #         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc1.5/')
             ############################################### cal nss  ###################################
-            # self.cal_nss(
-            #         Multi_255 = False,
-            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
-            #         prediction_src_path = '/home/minglang/PAMI/fcb/',
-            #         dst_all_ss_path ='/home/minglang/PAMI/ss_result /FCB_and_ground/ss_all/',
-            #         dst_ave_ss_path ='/home/minglang/PAMI/ss_result /FCB_and_ground/ave_ss/')
+            self.cal_nss(
+                    Multi_255 = False,
+                    ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
+                    prediction_src_path = '/home/minglang/PAMI/fcb/fcb_0.5/',
+                    dst_all_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ss_all_0.5/',
+                    dst_ave_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ave_ss_0.5/')
             print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # minglang_get_ours_groundhp_cc,now1
@@ -670,6 +671,11 @@ class env_li():
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
 
+        if os.path.exists(dst_all_cc_path) is False:
+            os.mkdir(dst_all_cc_path)
+        if os.path.exists(dst_ave_cc_path) is False:
+            os.mkdir(dst_ave_cc_path)
+
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
@@ -706,6 +712,10 @@ class env_li():
         self.get_all_txt_groundtruth = self.load_get_all_txt_groundtruth_nss(groundtruth_path = ground_src_path)
 
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>self.load_all_txt_groundtruth end: ")
+        if os.path.exists(dst_all_ss_path) is False:
+            os.mkdir(dst_all_ss_path)
+        if os.path.exists(dst_ave_ss_path) is False:
+            os.mkdir(dst_ave_ss_path)
 
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
@@ -966,8 +976,8 @@ class env_li():
         return salmap
 
     def fixation2salmap_fcb_2dim(self,fixation, mapwidth, mapheight):
-        my_sigma_in_lon = 11.75
-        my_sigma_in_lat = 13.78
+        my_sigma_in_lon = 11.75 * 0.5
+        my_sigma_in_lat = 13.78 * 0.5
         fixation_total = np.shape(fixation)[0]
         x_degree_per_pixel = 360.0 / mapwidth
         y_degree_per_pixel = 180.0 / mapheight
@@ -1594,6 +1604,8 @@ class env_li():
         return heatmaps
 
     def save_heatmap(self,heatmap,path,name):
+        if os.path.exists(path) is False:
+            os.mkdir(path)
         heatmap = heatmap * 255.0
         # cv2.imwrite(path+'/'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
@@ -1601,6 +1613,8 @@ class env_li():
         # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
 
     def save_heatmap_for_nss(self,heatmap,path,name,Multi_255 = False):
+       if os.path.exists(path) is False:
+           os.mkdir(path)
        if Multi_255 is True:
            heatmap = heatmap * 255.0
        cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
