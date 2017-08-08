@@ -31,6 +31,7 @@ from move_view_lib import move_view
 from suppor_lib import *
 from move_view_lib_new import view_mover
 import tensorflow as tf
+import os
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -398,12 +399,13 @@ class env_li():
             #                                   path_A = '/media/minglang/Data0/PAMI/Haochen/HA/',
             #                                   path_B = '/media/minglang/Data0/PAMI/Haochen/HB/'
             #                                  )
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cal cc begin >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             self.cal_cc(
                     ground_src_path = '/media/minglang/Data0/PAMI/Haochen/HA/',
-                    prediction_src_path = '/media/minglang/Data0/PAMI/Haochen/HB/',
-                    dst_all_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/step_all/',
-                    dst_ave_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/ave/')
-            print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    prediction_src_path = '/media/minglang/Data0/PAMI/fcb/', # '/media/minglang/Data0/PAMI/Haochen/HB/',
+                    dst_all_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/step_all_fcb/',
+                    dst_ave_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/ave_fcb/')
+            # print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
@@ -426,7 +428,7 @@ class env_li():
                     max_temp = np.float32(np.max(temp))
                     temp = (temp/max_temp)
                     self.save_heatmap(heatmap = temp,
-                                      path = '/home/minglang/PAMI/fcb/',
+                                      path = '/media/minglang/Data0/PAMI/fcb/',
                                       name = str(step))
                 except Exception,e:
                     print Exception,":",e
@@ -1032,6 +1034,8 @@ class env_li():
 
     def save_ave_cc(self,ave_cc,std_cc,path):
         print("cc average "+str(self.cc_averaged))
+        if os.path.exists(path) is False:
+            os.mkdir(path)
         f = open(path+'ave_cc.txt','a')
         # f = open('cc_result/'+str(self.env_id)+'_cc_on_frame.txt','a')
         print_string = '\t'
@@ -1044,6 +1048,8 @@ class env_li():
 
     def save_step_cc(self,cc,step,path):
         print("cc for step "+str(step)+" is "+str(cc))
+        if os.path.exists(path) is False:
+            os.mkdir(path)
         f = open(path+str(self.env_id)+'_cc_on_step.txt','w')
         print_string = '\t'
         print_string += 'step' + '\t'
@@ -1155,10 +1161,10 @@ class env_li():
                     groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
                 groundtruth_heatmap = self.fixation2salmap_sp_my_sigma(groundtruth_fixation, self.salmap_width, self.salmap_height, my_sigma = sigma)
                 self.save_heatmap(heatmap=groundtruth_heatmap,
-                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap/',
+                                  path='/home/minglang/PAMI/test_file/ground_truth_hmap_for_haoceng/',
                                   name=str(step))
-                groundtruth_heatmaps += [groundtruth_heatmap]
-                print(np.shape(groundtruth_heatmaps))
+                # groundtruth_heatmaps += [groundtruth_heatmap]
+                print(">>>>>>>>>>>>>>>>>>>>>>def save_gt_heatmaps(self): str(step)+'/'+str(self.step_total):",str(step)+'/'+str(self.step_total))
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1169,7 +1175,7 @@ class env_li():
         print('save_gt_heatmaps')
         '''for fixation'''
         # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
-        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))*0.5#cc is large .chose half of sigma
+        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5))) * 0.126#cc is large .chose half of sigma
         groundtruth_heatmaps=[]
 
         # random dive the subjects to tow groups
@@ -1220,7 +1226,7 @@ class env_li():
             except Exception,e:
                 print Exception,":",e
                 continue
-        print(s)
+        # print(s)
 
     def save_gt_groundtruth_heatmaps_for_nss(self,Multi_255 = True,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/'):
         groundtruth_heatmaps=[]
@@ -1334,8 +1340,6 @@ class env_li():
         salmap = salmap * ( 1.0 / np.amax(salmap) )
         salmap = np.transpose(salmap)
         return salmap
-
-
 
     def log_thread_config(self):
 
@@ -1688,6 +1692,8 @@ class env_li():
         return heatmaps
 
     def save_heatmap(self,heatmap,path,name):
+        if os.path.exists(path) is False:
+            os.mkdir(path)
         heatmap = heatmap * 255.0
         # cv2.imwrite(path+'/'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
