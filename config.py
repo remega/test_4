@@ -318,7 +318,7 @@ elif project is 'f':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
             #bing1
-            game_dic = game_dic[70:76]
+            game_dic = game_dic[0:8]
             # game_dic = f_game_dic_new_test[0:1] # for test the cc
 
 '''default config'''

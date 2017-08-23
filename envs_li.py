@@ -395,17 +395,19 @@ class env_li():
             print('>>>>>>>>>>>>>>>>>>>>minglang_get_ground_truth_heatmap<<<<<<<<<<<<<<<<<<<<<<<<<')
             # print(dsnfj)
             # self.save_gt_heatmaps()
+            self.status1 = '_' + '2' + '/'
+            self.sigma = 2
             # self.save_gt_heatmaps_for_haoceng(
-            #                                   path_A = '/media/minglang/Data0/PAMI/Haochen/HA/',
-            #                                   path_B = '/media/minglang/Data0/PAMI/Haochen/HB/'
+            #                                   path_A = '/media/minglang/Data0/PAMI/Haochen/HA' + self.status1,
+            #                                   path_B = '/media/minglang/Data0/PAMI/Haochen/HB' + self.status1
             #                                  )
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cal cc begin >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cal cc begin >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             self.cal_cc(
-                    ground_src_path = '/media/minglang/Data0/PAMI/Haochen/HA/',
-                    prediction_src_path = '/media/minglang/Data0/PAMI/fcb/', # '/media/minglang/Data0/PAMI/Haochen/HB/',
-                    dst_all_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/step_all_fcb/',
-                    dst_ave_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/ave_fcb/')
-            # print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
+                    ground_src_path = '/media/minglang/Data0/PAMI/Haochen/HA' + self.status1,
+                      prediction_src_path = '/media/minglang/Data0/PAMI/Haochen/HB' + self.status1, # '/media/minglang/Data0/PAMI/Haochen/HB/', '/media/minglang/Data0/PAMI/fcb/'
+                    dst_all_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/step' + self.status1,
+                    dst_ave_cc_path ='/media/minglang/Data0/PAMI/Haochen/CC_DEV/ave' + self.status1)
+            # # print('>>>>>>>>>>>>>>>>>>>>end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
@@ -1175,7 +1177,9 @@ class env_li():
         print('save_gt_heatmaps')
         '''for fixation'''
         # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5)))
-        sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5))) * 0.126#cc is large .chose half of sigma
+        # sigma = 51.0 / (math.sqrt(-2.0*math.log(0.5))) * 0.0693#cc is large .chose half of sigma,record in temp.py
+        sigma = self.sigma
+        # sigma = 3.96 ---> 44
         groundtruth_heatmaps=[]
 
         # random dive the subjects to tow groups
