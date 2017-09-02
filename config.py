@@ -13,7 +13,7 @@ elif project is 'f':
     elif mode is 'data_processor': # bing0
         if_data_provessor_debug = True
         data_processor_mode = {  '1':'availible:minglang_mp4_to_yuv',
-                                 '2': 'compute_consi,minglang_mp4_to_jpg',
+                                 '2':'minglang_mp4_to_jpg',
                                  '3':'minglang_obdl_cfg',
                                  '4': 'minglang_get_ground_truth_heatmap',
                                  '5':'minglang_get_ground_truth_heatmap_for_nss',
@@ -26,7 +26,7 @@ elif project is 'f':
                                  '11':'minglang_get_salicon_groundhp_ss_cc',
                                  '12':'minglang_get_fcb_groundhp_ss_cc'
                               }
-        data_processor_id = data_processor_mode['12']
+        data_processor_id = data_processor_mode['8']
 
 '''log config'''
 if mode is 'off_line':
@@ -315,7 +315,7 @@ elif project is 'f':
             game_dic = game_dic_new_all
         if if_data_provessor_debug is True:
             #bing1
-            # game_dic = game_dic[10:20]
+            # game_dic = game_dic[50:76]
             game_dic = f_game_dic_new_test[0:15] # for test the cc
 
 '''default config'''
