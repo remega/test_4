@@ -445,14 +445,14 @@ class env_li():
         # minglang_get_ours_groundhp_cc,now1
         if data_processor_id is 'minglang_get_ours_groundhp_ss_cc':
             print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss_cc star<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-            with_fcb = True # True Flase
+            with_fcb = False # True Flase
             ###################### get the heatmap #########################
             ############self.save_ours_heatmap()
             #####################  cal the CC  ############################
             # self.cal_ours_ground_cc()
             if with_fcb is True:
                 self.cal_cc(
-                        ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
+                        ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/', #the default sigma is 7
                         prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_with_fcb/',
                         dst_all_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps_with_fcb/' ,
                         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb/')
@@ -460,7 +460,7 @@ class env_li():
             else:
                 self.cal_cc(
                         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
-                        prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb /',
+                        prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb/',
                         dst_all_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps/' ,
                         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc/')
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
