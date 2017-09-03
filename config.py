@@ -24,7 +24,9 @@ elif project is 'f':
                                  '9':'minglang_get_bms_groundhp_ss_cc',
                                  '10':'minglang_get_obdl_groundhp_ss_cc',
                                  '11':'minglang_get_salicon_groundhp_ss_cc',
-                                 '12':'minglang_get_fcb_groundhp_ss_cc'
+                                 '12':'minglang_get_fcb_groundhp_ss_cc',
+                                 ############################## for fitting #################
+                                 '13': 'ave_for_fitting'
                               }
         data_processor_id = data_processor_mode['8']
 

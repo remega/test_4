@@ -1,24 +1,12 @@
 import numpy as np
 
-# a = [[1,2],[3,4],[5,6]]
-#
-# print('np.shape(a): ',np.shape(a)) # (3,2)
-#
-# ave_ss = []
-#
-# for x in range(3):
-#     for y in range(2):
-#         if a[x][y] > 0:
-#             print('x,y: ',x,y)
-#             print('a[x][y]: ',a[x][y])
-#             ave_ss.append(a[x][y])
-#
-# ave_ss = np.mean(ave_ss)
-#
-# print("ave_ss", ave_ss)
+f = open('/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb_fitting/ave_cc_0902_12_0.5_minglang_get_ours_groundhp_ss_cc.txt',"r")
+lines = f.readlines() #read all lines
+cc = []
+for line in lines:
+    line = line.split()
+    print(line[1])
+    cc.append(float(line[1]))
 
-a = 2
-
-b = np.float32(a)
-
-print(b)
+ave_cc_all_videos = np.mean(cc)
+print('ave_cc_all_videos: ',ave_cc_all_videos)
