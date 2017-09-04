@@ -428,19 +428,19 @@ class env_li():
         if data_processor_id is 'minglang_get_fcb_groundhp_ss_cc':
             # print('>>>>>>>>>>>>>>>>>>>>ming_fcb_SS_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
             ####################################### cal cc#################################################
-            # self.cal_cc(
-            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
-            #         prediction_src_path = '/home/minglang/PAMI/fcb/fcb_1.5/',
-            #         dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all_1.5/',
-            #         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc1.5/')
+            self.cal_cc(
+                    ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
+                    prediction_src_path = '/home/minglang/PAMI/fcb/fcb_1.5/',
+                    dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all_1.5/',
+                    dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc1.5/')
             ############################################### cal nss  ###################################
-            self.cal_nss(
-                    Multi_255 = False,
-                    ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
-                    prediction_src_path = '/home/minglang/PAMI/fcb/fcb_0.5/',
-                    dst_all_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ss_all_0.5/',
-                    dst_ave_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ave_ss_0.5/')
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            # self.cal_nss(
+            #         Multi_255 = False,
+            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/',
+            #         prediction_src_path = '/home/minglang/PAMI/fcb/fcb_0.5/',
+            #         dst_all_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ss_all_0.5/',
+            #         dst_ave_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ave_ss_0.5/')
+            # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
         # minglang_get_ours_groundhp_cc,now1
         if data_processor_id is 'minglang_get_ours_groundhp_ss_cc':
