@@ -407,16 +407,18 @@ class env_li():
         # get and save fcb_heatmap
         if data_processor_id is 'minglang_get_fcb':
             print('>>>>>>>>>>>>>>>>>>>>minglang_get_fcb start <<<<<<<<<<<<<<<<<<<<<<<<<')
+
+            self.fcb_sigma = 21
             for step in range(self.step_total):
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: ", step)
                 data = int(round((step)*self.data_per_step))
                 frame = int(round((step)*self.frame_per_step))
                 try:
-                    temp = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height)
+                    temp = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
                     max_temp = np.float32(np.max(temp))
-                    temp = (temp/max_temp)
+                    temp = (temp * 1.0 / max_temp)
                     self.save_heatmap(heatmap = temp,
-                                      path = '/home/minglang/PAMI/fcb/fcb_0.5/',
+                                      path = '/home/minglang/PAMI/fcb/fcb_0902_' + str(self.fcb_sigma) + '/',
                                       name = str(step))
                 except Exception,e:
                     print Exception,":",e
@@ -426,13 +428,30 @@ class env_li():
 
         # get ming_fcb_ss_cc
         if data_processor_id is 'minglang_get_fcb_groundhp_ss_cc':
-            # print('>>>>>>>>>>>>>>>>>>>>ming_fcb_SS_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
+            print('>>>>>>>>>>>>>>>>>>>>ming_fcb_SS_cc<<<<<<<<<<<<<<<<<<<<<<<<<')
             ####################################### cal cc#################################################
-            self.cal_cc(
-                    ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
-                    prediction_src_path = '/home/minglang/PAMI/fcb/fcb_1.5/',
-                    dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all_1.5/',
-                    dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc1.5/')
+            # self.cal_cc(
+            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
+            #         prediction_src_path = '/home/minglang/PAMI/fcb/fcb_0902_21/',
+            #         dst_all_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/cc_all_1.5/',
+            #         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/fcb_and_ground/ave_cc_0904/')
+
+            # # 'calculate the ave cc of one videos, without save the fcb map to jpg'
+            # self.cal_cc_multi_fcb(
+            #         fcb_start = 70,
+            #         fcb_stop  = 221,
+            #         fcb_step  = 1,
+            #         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
+            #         dst_ave_cc_path = '/home/minglang/PAMI/cc_result/fcb_and_ground/multi_fcb_0904/')
+
+            'calculate the ave cc of all videos'
+            self.cal_ave_cc_all_videos(
+                                        fcb_start = 70,
+                                        fcb_stop  = 220,
+                                        fcb_step  = 1,
+                                        source_path = '/home/minglang/PAMI/cc_result/fcb_and_ground/multi_fcb_0904/',
+                                        save_path = '/home/minglang/PAMI/cc_result/fcb_and_ground/multi_fcb_0904/ave_cc_all_videos/')
+
             ############################################### cal nss  ###################################
             # self.cal_nss(
             #         Multi_255 = False,
@@ -441,6 +460,7 @@ class env_li():
             #         dst_all_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ss_all_0.5/',
             #         dst_ave_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ave_ss_0.5/')
             # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+            print(myx)
 
         # minglang_get_ours_groundhp_cc,now1
         if data_processor_id is 'minglang_get_ours_groundhp_ss_cc':
@@ -679,12 +699,15 @@ class env_li():
         for step in range(self.step_total-1):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
-            print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+            # print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+            # print('>>>>>>>>>>>>>>>>>>>>>>> ', np.max(self.gt_heatmaps_ours[step]), np.max(self.gt_heatmaps_groundtruth[step]))
+            # print(myx)
+
             cc = self.calc_score(self.gt_heatmaps_ours[step],self.gt_heatmaps_groundtruth[step])
             if math.isnan(float(cc)) is False:
-                self.save_step_cc(cc=cc,
-                                  step=step,
-                                  path = dst_all_cc_path)
+                # self.save_step_cc(cc=cc,
+                #                   step=step,
+                #                   path = dst_all_cc_path)
                 # if(step > 0):
                 ccs += [cc]
         self.cc_averaged = sum(ccs)/len(ccs)
@@ -692,6 +715,77 @@ class env_li():
                          path = dst_ave_cc_path)
         print("cc average "+str(self.cc_averaged))
         print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+    # nowc
+    def cal_cc_multi_fcb(self, fcb_start, fcb_stop, ground_src_path, dst_ave_cc_path,fcb_step = 1):
+        self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(groundtruth_path = ground_src_path) #load ground-truth heatmap
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
+
+        for fcb_sigma in range(fcb_start, fcb_stop, fcb_step): # (180,220,1)
+            ccs = []
+            "fcb parameter"
+            self.fcb_sigma = fcb_sigma * (1.0 / 10)
+            self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
+            # self.fcb_map = self.fcb_map * 1.0 / np.max(self.fcb_map)
+
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>> weight_i: ", str(self.fcb_sigma))
+
+            'cal cc loop start'
+            for step in range(self.step_total-1):
+                data = int(round((step)*self.data_per_step))
+                frame = int(round((step)*self.frame_per_step))
+                # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>max(fcb_map),max(gt_heatmaps_groundtruth): "\
+                #       ,np.max(self.fcb_map), np.max(self.gt_heatmaps_groundtruth[step]))
+                # print(myx)
+                cc = self.calc_score(self.fcb_map, self.gt_heatmaps_groundtruth[step])
+                if math.isnan(float(cc)) is False:
+                    ccs += [cc]
+
+            self.cc_averaged = sum(ccs)/len(ccs)
+            self.save_ave_cc(self.cc_averaged,
+                             path = dst_ave_cc_path)
+
+            print("cc average "+str(self.cc_averaged))
+            'cal cc loop end'
+
+        print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+    def cal_ave_cc_all_videos(self,fcb_start,fcb_stop,fcb_step,source_path,save_path):
+        f_max = []
+
+        for fcb_sigma in range(fcb_start, fcb_stop, fcb_step): # (180,220,1)
+            cc = [] # remember to clear the cc befor next loo
+            "fcb parameter"
+            self.fcb_sigma = fcb_sigma * (1.0 / 10)
+
+            'cal_ave_cc_all_videos loop start'
+            path_source = source_path + '_' + str(self.fcb_sigma) + '_ave_cc.txt'
+            path_save = save_path  + '_' + 'all_videos' + '.txt'
+
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.fcb_sigma', fcb_sigma)
+            f = open(path_source, "r")
+            lines = f.readlines() #read all lines
+            for line in lines:
+                line = line.split()
+                print(line[1])
+                cc.append(float(line[1]))
+
+            ave_cc_all_videos = np.mean(cc)
+            print('ave_cc_all_videos: ',ave_cc_all_videos)
+
+            # if os.path.exists(path_save) is True:
+            #     os.remove(path_save)
+            if os.path.exists(save_path) is False:
+                os.mkdir(save_path)
+
+            f_save = open(path_save,'a')
+            save_string = str(ave_cc_all_videos) + '\t' + str(self.fcb_sigma) + '\n'
+            f_save.write(save_string)
+            f_save.close()
+            'cal_ave_cc_all_videos loop end'
+
+        print('cal_ave_cc_all_videos end')
+
 
     # nows(for location here quickly)
     def cal_nss(self,Multi_255,ground_src_path, prediction_src_path, dst_all_ss_path,dst_ave_ss_path):
@@ -975,9 +1069,9 @@ class env_li():
         salmap = np.transpose(salmap)
         return salmap
 
-    def fixation2salmap_fcb_2dim(self,fixation, mapwidth, mapheight):
-        my_sigma_in_lon = 11.75 * 0.5
-        my_sigma_in_lat = 13.78 * 0.5
+    def fixation2salmap_fcb_2dim(self, fixation, mapwidth, mapheight, sigma = 7):
+        my_sigma_in_lon = sigma
+        my_sigma_in_lat = sigma
         fixation_total = np.shape(fixation)[0]
         x_degree_per_pixel = 360.0 / mapwidth
         y_degree_per_pixel = 180.0 / mapheight
@@ -1004,14 +1098,17 @@ class env_li():
 
 
     def save_ave_cc(self,ave_cc,path):
-        print("cc average "+str(self.cc_averaged))
-        f = open(path+'ave_cc.txt','a')
-        # f = open('cc_result/'+str(self.env_id)+'_cc_on_frame.txt','a')
-        print_string = '\t'
-        # print_string += 'step' + '\t'
-        print_string += str(self.env_id) + '\t'+ '\t'
-        # print_string += 'ave_cc' + '\t'
-        print_string += str(ave_cc) + '\t'
+
+        # if os.path.exists(path + '_' + str(self.fcb_sigma) + '_ave_cc.txt') is True:
+        #     os.remove(path + '_' + str(self.fcb_sigma) + '_ave_cc.txt')
+        if os.path.exists(path) is False:
+            os.mkdir(path)
+
+        f = open(path + '_' + str(self.fcb_sigma) + '_ave_cc.txt','a')
+        # f = open(path + '_ave_cc.txt','a')
+        print_string = ''
+        print_string += str(self.env_id) + '\t'
+        print_string += str(ave_cc)
         print_string += '\n'
         f.write(print_string)
         f.close()
@@ -1056,7 +1153,7 @@ class env_li():
                 # file_name = '/home/minglang/PAMI/gt_heatmap_sp_sigma_half_fov/'+self.env_id+'_'+str(step)+'.jpg'
                 #for our's hmap
                 # file_name = '/home/minglang/PAMI/ff_best_heatmaps_ours/'+str(self.env_id)+'/'+str(step)+'.jpg'
-                file_name = source_path + self.env_id+'_'+str(step)+'.jpg'
+                file_name = source_path + self.env_id+'_'+str(step)+'.png'
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>file_name  ", file_name)
                 print(">>>>>>>>>>>>>>>>>def load_gt_heatmaps: self.env_id, step: ",self.env_id,step)
                 temp = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
@@ -1084,7 +1181,7 @@ class env_li():
                 temp0 = cv2.resize(temp,(self.salmap_width, self.salmap_height))
                 temp0 = temp0 / 255.0
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: np.shape(temp0),step,np.max(temp0)",np.shape(temp0),step,np.max(temp0))
-                heatmaps += [temp]
+                heatmaps += [temp0]
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1609,7 +1706,7 @@ class env_li():
         heatmap = heatmap * 255.0
         # cv2.imwrite(path+'/'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+self.env_id+'_'+name+'.jpg',heatmap)
-        cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
+        cv2.imwrite(path + self.env_id + '_' + name + '.png',heatmap)
         # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
 
     def save_heatmap_for_nss(self,heatmap,path,name,Multi_255 = False):

@@ -26,7 +26,7 @@ elif project is 'f':
                                  '11':'minglang_get_salicon_groundhp_ss_cc',
                                  '12':'minglang_get_fcb_groundhp_ss_cc'
                               }
-        data_processor_id = data_processor_mode['8']
+        data_processor_id = data_processor_mode['12']
 
 '''log config'''
 if mode is 'off_line':
@@ -316,7 +316,7 @@ elif project is 'f':
         if if_data_provessor_debug is True:
             #bing1
             # game_dic = game_dic[10:20]
-            game_dic = f_game_dic_new_test[0:15] # for test the cc
+            game_dic = f_game_dic_new_test[0:1] # for test the cc
 
 '''default config'''
 
