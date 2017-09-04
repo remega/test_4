@@ -422,7 +422,6 @@ class env_li():
 
         # get and save groundtruth_heatmap
         if data_processor_id is 'minglang_get_ground_truth_heatmap':
-
             print('>>>>>>>>>>>>>>>>>>>>minglang_get_ground_truth_heatmap<<<<<<<<<<<<<<<<<<<<<<<<<')
             # print(dsnfj)
             self.save_gt_heatmaps()
@@ -442,8 +441,8 @@ class env_li():
             print('>>>>>>>>>>>>>>>>>>>>minglang_get_fcb start <<<<<<<<<<<<<<<<<<<<<<<<<')
             for step in range(self.step_total):
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>: ", step)
-                data = int(round((step)*self.data_per_step))
-                frame = int(round((step)*self.frame_per_step))
+                data = int(round((step) * self.data_per_step))
+                frame = int(round((step) * self.frame_per_step))
                 try:
                     temp = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height, sigma = self.fcb_sigma)
                     max_temp = np.float32(np.max(temp))
@@ -480,15 +479,17 @@ class env_li():
                     dst_ave_ss_path ='/home/minglang/PAMI/ss_result /fcb_and_ground/ave_ss_' + str(self.fcb_sigma) + '/')
             # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if data_processor_id is 'ave_for_fitting':
+
             ''' load the cc result,calculate ave_cc in all videos,save the result
                 ine one txt
             '''
+
             # "weight parametr"
             # self.w_prediction = 0.5
             # self.w_fcb = 1 - self.w_prediction # 0.1374
-            "fcb parameter"
-            self.fcb_sigma = 12
-            self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
+            # "fcb parameter"
+            # self.fcb_sigma = 21
+            # self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
             pass
             self.cal_ave_cc_all_videos(
                                         source_path = '/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb_fitting/',
@@ -505,9 +506,9 @@ class env_li():
             # "weight parametr"
             # self.w_prediction = 0.5
             # self.w_fcb = 1 - self.w_prediction # 0.1374
-            "fcb parameter"
-            self.fcb_sigma = 12
-            self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
+            # "fcb parameter"
+            # self.fcb_sigma = 21
+            # self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
             ###################### get the heatmap #########################
             # self.save_ours_heatmap_svm()
             #####################  cal the CC  ############################
@@ -767,48 +768,54 @@ class env_li():
     def cal_cc_fcb_fitting(self,ground_src_path, prediction_src_path,dst_all_cc_path,dst_ave_cc_path):
         ccs = []
         fcb_maps = []
-
         self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = prediction_src_path) #load ours heatmap
         self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(groundtruth_path = ground_src_path) #load ground-truth heatmap
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
-
         if os.path.exists(dst_all_cc_path) is False:
             os.mkdir(dst_all_cc_path)
         if os.path.exists(dst_ave_cc_path) is False:
             os.mkdir(dst_ave_cc_path)
 
-        for weight_i in range(10,100,1):
-            "weight parametr"
-            self.w_prediction = weight_i * 1.0 / 100
-            self.w_fcb = 1 - self.w_prediction # 0.1374
+        for fcb_sigma in range(180,220,1): # (180,220,1)
+            "fcb parameter"
+            self.fcb_sigma = fcb_sigma * (1.0 / 10)
+            self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
 
-            'cal cc loop start'
-            for step in range(self.step_total-1):
-                data = int(round((step)*self.data_per_step))
-                frame = int(round((step)*self.frame_per_step))
-                print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
-                ''' multipy the fcb for fitting'''
-                print(">>>>>>>>>>>>>>np.max(self.gt_heatmaps_ours[step]),np.max(self.fcb_map),self.w_prediction,self.w_fcb: ",\
-                      np.max(self.gt_heatmaps_ours[step]), np.max(self.fcb_map), self.w_prediction, self.w_fcb)
-                self.gt_heatmaps_ours[step] = self.gt_heatmaps_ours[step] * self.w_prediction + self.fcb_map * self.w_fcb
-                self.gt_heatmaps_ours[step] = self.gt_heatmaps_ours[step] * (1.0 / np.max(self.gt_heatmaps_ours[step])) * 255
-                print('>>>>>>>>>>>>>>>>>>>>>>>>np.max(self.gt_heatmaps_ours[step]),np.max(self.gt_heatmaps_groundtruth[step]): ',\
-                       np.max(self.gt_heatmaps_ours[step]),np.max(self.gt_heatmaps_groundtruth[step]))
-                # print(myx)
-                cc = self.calc_score(self.gt_heatmaps_ours[step],self.gt_heatmaps_groundtruth[step])
-                if math.isnan(float(cc)) is False:
-                    # self.save_step_cc(cc=cc,
-                    #                   step=step,
-                    #                   path = dst_all_cc_path)
-                    # if(step > 0):
-                    ccs += [cc]
+            for weight_i in range(0,101,1):
+                "weight parametr"
+                self.w_prediction = weight_i * 1.0 / 100
+                self.w_fcb = 1 - self.w_prediction # 0.1374
+                self.gt_heatmaps_ours_0 = [None] * (self.step_total-1)
+                self.gt_heatmaps_ours_1 = [None] * (self.step_total-1)
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>>> weight_i: ", weight_i * 1.0 / 100)
 
-            self.cc_averaged = sum(ccs)/len(ccs)
-            self.save_ave_cc(self.cc_averaged,
-                             path = dst_ave_cc_path)
-            print("cc average "+str(self.cc_averaged))
-            'cal cc loop end'
+                'cal cc loop start'
+                for step in range(self.step_total-1):
+                    data = int(round((step)*self.data_per_step))
+                    frame = int(round((step)*self.frame_per_step))
+                    # print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
+                    # ''' multipy the fcb for fitting'''
+                    # print(">>>>>>>>>>>>>>np.max(self.gt_heatmaps_ours[step]),np.max(self.fcb_map),self.w_prediction,self.w_fcb: ",\
+                    #       np.max(self.gt_heatmaps_ours[step]), np.max(self.fcb_map), self.w_prediction, self.w_fcb)
+                    self.gt_heatmaps_ours_0[step] = self.gt_heatmaps_ours[step] * self.w_prediction + self.fcb_map * self.w_fcb
+                    self.gt_heatmaps_ours_1[step] = self.gt_heatmaps_ours_0[step] * (1.0 / np.max(self.gt_heatmaps_ours_0[step]))
+                    # print('>>>>>>>>>>>>>>>>>>>>>>>>np.max(self.gt_heatmaps_ours_1[step]),np.max(self.gt_heatmaps_groundtruth[step]): ',\
+                    #        np.max(self.gt_heatmaps_ours_1[step]),np.max(self.gt_heatmaps_groundtruth[step]))
+                    # print(myx)
+                    cc = self.calc_score(self.gt_heatmaps_ours_1[step],self.gt_heatmaps_groundtruth[step])
+                    if math.isnan(float(cc)) is False:
+                        # self.save_step_cc(cc=cc,
+                        #                   step=step,
+                        #                   path = dst_all_cc_path)
+                        # if(step > 0):
+                        ccs += [cc]
+
+                self.cc_averaged = sum(ccs)/len(ccs)
+                self.save_ave_cc(self.cc_averaged,
+                                 path = dst_ave_cc_path)
+                # print("cc average "+str(self.cc_averaged))
+                'cal cc loop end'
 
         print('>>>>>>>>>>>>>>>>>>>>cal_obdl_ground_cc_end<<<<<<<<<<<<<<<<<<<<<<<<<')
 
@@ -1273,7 +1280,7 @@ class env_li():
                 temp0 = cv2.resize(temp,(self.salmap_width, self.salmap_height))
                 temp0 = temp0 / 255.0
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: np.shape(temp0),step,np.max(temp0)",np.shape(temp0),step,np.max(temp0))
-                heatmaps += [temp]
+                heatmaps += [temp0]
             except Exception,e:
                 print Exception,":",e
                 continue
@@ -1805,34 +1812,50 @@ class env_li():
 
     def cal_ave_cc_all_videos(self,source_path,save_path):
         pass
-        for weight_i in range(0,100,1):
-            "weight parametr"
-            self.w_prediction = weight_i * 1.0 / 100
-            self.w_fcb = 1 - self.w_prediction # 0.1374
+        f_max = []
+        for fcb_sigma in range(180,220,1): # (180,220,1)
+            "fcb parameter"
+            self.fcb_sigma = fcb_sigma * (1.0 / 10)
+            self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
 
-            'cal_ave_cc_all_videos loop start'
-            path_source = source_path + self.save_date + '_' + str(self.fcb_sigma) + '_' + str(self.w_prediction) + '.txt'
-            path_save = save_path + self.save_date + '.txt'
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.here_1')
-            f = open(path_source, "r")
-            lines = f.readlines() #read all lines
-            cc = []
-            for line in lines:
-                line = line.split()
-                print(line[1])
-                cc.append(float(line[1]))
+            for weight_i in range(0,101,1):
+                "weight parametr"
+                self.w_prediction = weight_i * 1.0 / 100
+                self.w_fcb = 1 - self.w_prediction # 0.1374
 
-            ave_cc_all_videos = np.mean(cc)
-            print('ave_cc_all_videos: ',ave_cc_all_videos)
+                'cal_ave_cc_all_videos loop start'
+                path_source = source_path + self.save_date + '_' + str(self.fcb_sigma) + '_' + str(self.w_prediction) + '.txt'
+                path_save = save_path + '_' + str(self.fcb_sigma) + '_' +self.save_date + '.txt'
+                print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.weight_i', weight_i)
+                f = open(path_source, "r")
+                lines = f.readlines() #read all lines
+                cc = []
+                for line in lines:
+                    line = line.split()
+                    print(line[1])
+                    cc.append(float(line[1]))
 
-            if os.path.exists(save_path) is False:
-                os.mkdir(save_path)
-                print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.here_2')
-            f_save = open(path_save,'a')
-            save_string = str(ave_cc_all_videos) + '\t' + str(self.fcb_sigma) + '\t' + str(self.w_prediction)+'\n'
-            f_save.write(save_string)
-            f_save.close()
-            'cal_ave_cc_all_videos loop end'
+                ave_cc_all_videos = np.mean(cc)
+                print('ave_cc_all_videos: ',ave_cc_all_videos)
+                #
+                # if os.path.exists(path_save) is True:
+                #     os.remove(path_save)
+                if os.path.exists(save_path) is False:
+                    os.mkdir(save_path)
+                    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.here_2')
+                f_save = open(path_save,'a')
+                save_string = str(ave_cc_all_videos) + '\t' + str(self.fcb_sigma) + '\t' + str(self.w_prediction)+'\n'
+                f_save.write(save_string)
+                f_save.close()
+
+                f_max.append(str(ave_cc_all_videos))
+                f_max.append(str(self.fcb_sigma))
+                f_max.append(str(self.w_prediction))
+                f_max.append('\n')
+                'cal_ave_cc_all_videos loop end'
+        cc_max = f_max
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:cc_max ", cc_max)
+
         print('cal_ave_cc_all_videos end')
 
     def save_heatmap_for_nss(self,heatmap,path,name,Multi_255 = False):

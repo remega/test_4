@@ -28,7 +28,7 @@ elif project is 'f':
                                  ############################## for fitting #################
                                  '13': 'ave_for_fitting'
                               }
-        data_processor_id = data_processor_mode['8']
+        data_processor_id = data_processor_mode['13']
 
 '''log config'''
 if mode is 'off_line':
@@ -318,7 +318,7 @@ elif project is 'f':
         if if_data_provessor_debug is True:
             #bing1
             # game_dic = game_dic[50:76]
-            game_dic = f_game_dic_new_test[0:15] # for test the cc
+            game_dic = f_game_dic_new_test[0:1] # for test the cc
 
 '''default config'''
 
