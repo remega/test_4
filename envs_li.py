@@ -480,7 +480,8 @@ class env_li():
             # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> minglang_get_fcb_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
         if data_processor_id is 'ave_for_fitting':
 
-            ''' load the cc result,calculate ave_cc in all videos,save the result
+            '''
+                load the cc result,calculate ave_cc in all videos,save the result
                 ine one txt
             '''
 
@@ -492,9 +493,11 @@ class env_li():
             # self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
             pass
             self.cal_ave_cc_all_videos(
+                                        fcb_start = 221,
+                                        fcb_stop = 441,
+                                        fcb_step = 5,
                                         source_path = '/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb_fitting/',
-                                        save_path = '/home/minglang/PAMI/cc_result/ours_and_ground/all_videos_ave_cc_with_fcb_fitting/'
-            )
+                                        save_path = '/home/minglang/PAMI/cc_result/ours_and_ground/all_videos_ave_cc_with_fcb_fitting/' )
             print(">>>>>>>>>>>>>>>>>>>>>>>>>>ave_for_fitting teminate")
             print(myx)
 
@@ -521,14 +524,20 @@ class env_li():
                 #         dst_all_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps_with_fcb_svm_12_' + status_fcb + '_' + str(self.fcb_sigma) + '/',
                 #         dst_ave_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb_svm_svm_12_' + status_fcb + '_' + str(self.fcb_sigma) + '/')
                 self.cal_cc_fcb_fitting(
+                                        fcb_start = 133,
+                                        fcb_stop = 134,
+                                        fcb_step = 1,
                                         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
                                         prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb/',
-                                        dst_all_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps_with_fcb_svm_12/',
-                                        dst_ave_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/ave_cc_with_fcb_fitting/')
+                                        dst_all_cc_path = '/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps_with_fcb_svm_12/',
+                                        dst_ave_cc_path = '/home/minglang/PAMI/cc_result/ours_and_ground/Max_ave_cc_with_fcb_fitting/')
 
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_ours_groundhp_ss_cc with_fcb end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             else:
                 self.cal_cc(
+                        fcb_start = 210,
+                        fcb_stop = 211,
+                        fcb_step = 1,
                         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
                         prediction_src_path = '/home/minglang/PAMI/ff_best_heatmaps_ours/ff_best_heatmaps_ours_without_fcb/',
                         dst_all_cc_path ='/home/minglang/PAMI/cc_result/ours_and_ground/cc_all_steps/' ,
@@ -765,30 +774,31 @@ class env_li():
 
 
     # nowc
-    def cal_cc_fcb_fitting(self,ground_src_path, prediction_src_path,dst_all_cc_path,dst_ave_cc_path):
-        ccs = []
+    def cal_cc_fcb_fitting(self,ground_src_path, prediction_src_path,dst_all_cc_path,dst_ave_cc_path,fcb_start,fcb_stop,fcb_step):
         fcb_maps = []
         self.gt_heatmaps_ours = self.load_gt_heatmaps(source_path = prediction_src_path) #load ours heatmap
         self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(groundtruth_path = ground_src_path) #load ground-truth heatmap
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_ours: ',np.shape(self.gt_heatmaps_ours))
         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> np.shape(self.gt_heatmaps)_gt_heatmaps_groundtruth: ',np.shape(self.gt_heatmaps_groundtruth))
+
         if os.path.exists(dst_all_cc_path) is False:
             os.mkdir(dst_all_cc_path)
         if os.path.exists(dst_ave_cc_path) is False:
             os.mkdir(dst_ave_cc_path)
 
-        for fcb_sigma in range(180,220,1): # (180,220,1)
+        for fcb_sigma in range(fcb_start,fcb_stop,fcb_step): # (180,220,1)
             "fcb parameter"
             self.fcb_sigma = fcb_sigma * (1.0 / 10)
             self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
 
-            for weight_i in range(0,101,1):
+            for weight_i in range(72,73,1):
                 "weight parametr"
                 self.w_prediction = weight_i * 1.0 / 100
                 self.w_fcb = 1 - self.w_prediction # 0.1374
                 self.gt_heatmaps_ours_0 = [None] * (self.step_total-1)
                 self.gt_heatmaps_ours_1 = [None] * (self.step_total-1)
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>>> weight_i: ", weight_i * 1.0 / 100)
+                ccs = [] # note that you must clear the cc before every loop
 
                 'cal cc loop start'
                 for step in range(self.step_total-1):
@@ -805,10 +815,6 @@ class env_li():
                     # print(myx)
                     cc = self.calc_score(self.gt_heatmaps_ours_1[step],self.gt_heatmaps_groundtruth[step])
                     if math.isnan(float(cc)) is False:
-                        # self.save_step_cc(cc=cc,
-                        #                   step=step,
-                        #                   path = dst_all_cc_path)
-                        # if(step > 0):
                         ccs += [cc]
 
                 self.cc_averaged = sum(ccs)/len(ccs)
@@ -1810,26 +1816,26 @@ class env_li():
         cv2.imwrite(path+self.env_id+'_'+name+'.jpg',heatmap)
         # cv2.imwrite(path+'/'+'Let\'sNotBeAloneTonight'+'_'+name+'.jpg',heatmap)
 
-    def cal_ave_cc_all_videos(self,source_path,save_path):
+    def cal_ave_cc_all_videos(self,fcb_start,fcb_stop,fcb_step,source_path,save_path):
         pass
         f_max = []
-        for fcb_sigma in range(180,220,1): # (180,220,1)
+        for fcb_sigma in range(fcb_start,fcb_stop,fcb_step): # (180,220,1)
             "fcb parameter"
             self.fcb_sigma = fcb_sigma * (1.0 / 10)
             self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height,sigma = self.fcb_sigma)
 
-            for weight_i in range(0,101,1):
+            for weight_i in range(0,101,4):
+                cc = [] # clear the cc before loop
                 "weight parametr"
                 self.w_prediction = weight_i * 1.0 / 100
                 self.w_fcb = 1 - self.w_prediction # 0.1374
 
                 'cal_ave_cc_all_videos loop start'
                 path_source = source_path + self.save_date + '_' + str(self.fcb_sigma) + '_' + str(self.w_prediction) + '.txt'
-                path_save = save_path + '_' + str(self.fcb_sigma) + '_' +self.save_date + '.txt'
+                path_save = save_path + 'all_for_3d_fitting_' +self.save_date + '.txt'
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.weight_i', weight_i)
                 f = open(path_source, "r")
                 lines = f.readlines() #read all lines
-                cc = []
                 for line in lines:
                     line = line.split()
                     print(line[1])
@@ -1848,13 +1854,13 @@ class env_li():
                 f_save.write(save_string)
                 f_save.close()
 
-                f_max.append(str(ave_cc_all_videos))
-                f_max.append(str(self.fcb_sigma))
-                f_max.append(str(self.w_prediction))
-                f_max.append('\n')
-                'cal_ave_cc_all_videos loop end'
-        cc_max = f_max
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:cc_max ", cc_max)
+        #         f_max.append(str(ave_cc_all_videos))
+        #         f_max.append(str(self.fcb_sigma))
+        #         f_max.append(str(self.w_prediction))
+        #         f_max.append('\n')
+        #         'cal_ave_cc_all_videos loop end'
+        # cc_max = f_max
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:cc_max ", cc_max)
 
         print('cal_ave_cc_all_videos end')
 
