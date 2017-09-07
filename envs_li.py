@@ -400,10 +400,13 @@ class env_li():
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss start')
-            # self.test_save()
-            self.save_gt_groundtruth_heatmaps_for_nss(Multi_255 = False,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
-            # self.gt_heatmaps_groundtruth = self.load_gt_heatmaps_groundtruth(Multi_255 = False,nss_cc = True, groundtruth_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/')
+
+            self.save_gt_groundtruth_heatmaps_for_nss(
+                                                        save_path = '/media/minglang/Data0/For_Maixu/Scanpath/'
+                                                      )
+
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end')
+            print(myx)
 
 
         # get and save fcb_heatmap
@@ -1161,37 +1164,77 @@ class env_li():
                 continue
         print(s)
 
-    def save_gt_groundtruth_heatmaps_for_nss(self,Multi_255 = True,save_path = '/home/minglang/PAMI/test_file/ground_truth_hmap_for_nss_with_N/'):
+    def save_gt_groundtruth_heatmaps_for_nss(self,save_path):
         groundtruth_heatmaps=[]
+        all_lons = [None] * self.subjects_total
+        all_lats = [None] * self.subjects_total
+        all_frames_lons = np.zeros((self.step_total,self.subjects_total))
+        all_frames_lats = np.zeros((self.step_total,self.subjects_total))
+
         for step in range(self.step_total):
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
             try:
                 groundtruth_fixation = np.zeros((self.subjects_total, 2))
                 for subject in range(self.subjects_total):
-                    # print("self.subjects_total: ",self.subjects_total) # = 58
-                    # tow single value
                     groundtruth_fixation[subject, 0] = self.subjects[subject].data_frame[data].p[0]
                     groundtruth_fixation[subject, 1] = self.subjects[subject].data_frame[data].p[1]
-                "fix one step's data of 56 subjects"
-                groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = False)
-                # this function X255 to the heatmap depend on the paramiter Multi255
-                # debug01
-                # self.save_heatmap_for_nss(
-                #                   heatmap = groundtruth_heatmap,
-                #                   path = save_path,
-                #                   name = str(step),
-                #                   Multi_255 = Multi_255)
-                self.save_groundtruth_txt_for_nss(
-                                                value = groundtruth_heatmap,
-                                                path = save_path,
-                                                name = str(step)
-                                                )
-                print("self.save_groundtruth_txt_for_nss: step,np.max(groundtruth_heatmap) ", step, np.max(groundtruth_heatmap))
+                    'the lon and lat'
+                    all_lons[subject] = groundtruth_fixation[subject, 0]
+                    all_lats[subject] = groundtruth_fixation[subject, 1]
+                    print('>>>>>>>>>>>>>>>>>>>>>> all_lons[subject],all_lats[subject]: ', all_lons[subject],all_lats[subject])
+
+                'plot the locations'
+                f1 = plt.figure(1)
+                plt.title(str(self.env_id)+ '>>>step/all:' + str(step) + '/' + str(self.step_total))
+                plt.subplot(111)
+                plt.xlim(xmax=180, xmin=-180)
+                plt.ylim(ymax=90, ymin=-90)
+                # plt.scatter(all_lons[:],all_lats[:])
+                # plt.pause(2)
+                # plt.clf()
+                "fix one step's data of 58 subjects"
+                # groundtruth_heatmap = self.fixation2salmap_for_nss(groundtruth_fixation, self.salmap_width, self.salmap_height,normal = False
+                all_frames_lons[step,:] = all_lons[:]
+                all_frames_lats[step,:] = all_lats[:]
+                plt.scatter(all_frames_lons[step,:], all_frames_lats[step,:])
+                plt.pause(0.0000001)
+                plt.clf()
+
             except Exception,e:
                 print Exception,":",e
                 continue
+        print('>>>>>>np.shape(all_frames_lats),np.shape(all_frames_lons): ', np.shape(all_frames_lats),np.shape(all_frames_lons))
+        'save the scanpath locations'
+        self.save_groundtruth_txt_for_nss(
+                                        value = all_frames_lons,
+                                        path = save_path,
+                                        name = str(self.env_id) + 'all_frames_lons'
+                                        )
+        self.save_groundtruth_txt_for_nss(
+                                        value = all_frames_lats,
+                                        path = save_path,
+                                        name = str(self.env_id) + 'all_frames_lats'
+                                        )
         print(s)
+
+    "save groundtruth data as txt"
+    def save_groundtruth_txt_for_nss(self,value,path,name):
+
+        # if os.path.exists(path) is True:
+        #     os.rmdir(path[:-1])
+        if os.path.exists(path) is False:
+            os.mkdir(path)
+
+        f = open(path + name + '.txt','a') # 'w' mode will clear the formore data
+
+        for x in range(self.step_total):
+            print_string = ''
+            for y in range(self.subjects_total):
+                print_string += '\t' + str(value[x][y])
+            f.write(print_string + '\n')
+        f.close()
+
 
     def fixation2salmap_for_nss(self,fixation, mapwidth, mapheight,normal = False):
         fixation_total = np.shape(fixation)[0] # fixation_total) = 58
@@ -1218,19 +1261,7 @@ class env_li():
         salmap = np.transpose(salmap)# samle.T,change to (180,360)
         return salmap
 
-    "save groundtruth data as txt"
-    def save_groundtruth_txt_for_nss(self,value,path,name):
-        f = open(path+self.env_id+'_'+name+'.txt','w') # 'w' mode will clear the formore data
-        for x in range(self.salmap_height):
-            for y in range(self.salmap_width):
-                # print_string = ''
-                # print_string += 'step' + '\t'
-                print_string = str(x) + '\t'+str(y) +'\t'
-                # print_string += 'ave_cc' + '\t'
-                print_string += str(value[x][y]) + '\t'
-                print_string += '\n'
-                f.write(print_string)
-        f.close()
+
 
     def read_groundtruth_txt_for_nss(self,path):
         x = []
@@ -1647,54 +1678,3 @@ class env_li():
     #    print(">>>>>>>>>>>>>>>>>>>>>>>>def save_heatmap_for_nss: np.max(Image_read0),np.shape(Image_read0)", np.max(Image_read0),np.shape(Image_read0))
        # for debug1
        self.test_save(heatmap,name)
-
-    def test_save(self,heatmap,name):
-        "test the read image debug"
-        Image = np.zeros((360,180))
-        for x in range(360):
-            for y in range(60):
-                # print("x,y",x,y) # 359,179
-                Image[x][y] = 0
-
-        for x in range(360):
-            for y in range(60,180):
-            #   print("x1,y1",x,y) # 359,179
-              Image[x][y] = 0
-
-        for x in range(1):
-            for y in range(170,180):
-            #   print("x1,y1",x,y) # 359,179
-              Image[x][y] = 8.0
-
-        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def test_save(self,heatmap,name): np.shape(Image),np.shape(heatmap)",np.shape(Image),np.shape(heatmap))
-
-        path = '/home/minglang/test_code/'
-        # name = 't1'
-        # env_id = 'A1'
-        # Image = np.transpose(Image)
-        heatmap1 = Image
-        i = 0
-        # heatmap1 = np.transpose(heatmap) # samle.T
-        # for x in range(360):
-        #     for y  in range(180):
-        #         if heatmap1[x][y] > 0:
-        #             i += 1
-        #             print("i,x,y,heatmap[x][y]: ",i,x,y,heatmap1[x][y])
-
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> def test_save(self,heatmap,name): np.shape(Image),np.shape(heatmap)",np.shape(Image),np.shape(heatmap))
-        file_name = path+self.env_id+'_'+name+'.jpg'
-        heatmap_width = 360
-        heatmap_height = 180
-
-        cv2.imwrite(file_name, heatmap1)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>. def test_save(self,heatmap,name):np.shape(heatmap1),np.max(heatmap1) ", np.shape(Image),np.max(heatmap1))
-        Image_read0 = cv2.imread(file_name, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-        # Image_read1 = cv2.resize(Image_read0,(heatmap_width, heatmap_height))
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  def test_save(self,heatmap):np.shape(Image_read0),np.max(Image_read0): ",np.shape(Image_read0),np.max(Image_read0))
-
-        for x in range(360):
-            for y in range(180):
-                if Image_read0[x][y] > 0:
-                    # i += Image_read0[x][y]
-                    i = i + 1
-                    print("i,x,y,Image_read0[x][y]: ",i,x,y,Image_read0[x][y])
