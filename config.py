@@ -26,7 +26,7 @@ elif project is 'f':
                                  '11':'minglang_get_salicon_groundhp_ss_cc',
                                  '12':'minglang_get_fcb_groundhp_ss_cc'
                               }
-        data_processor_id = data_processor_mode['8']
+        data_processor_id = data_processor_mode['9']
 
 '''log config'''
 if mode is 'off_line':

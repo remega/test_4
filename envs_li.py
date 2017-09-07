@@ -113,6 +113,8 @@ class env_li():
         self.salmap_width = 360
         self.salmap_height = 180
 
+        'improve_cc'
+
         "fcb"
         self.fcb_map = self.fixation2salmap_fcb_2dim([[0.0,0.0]], self.salmap_width, self.salmap_height)
 
@@ -488,21 +490,21 @@ class env_li():
             ##################################### get the bms with step #######################################
             # self.save_bms_heatmaps(with_fcb = True) # True False
             # ################################# cal minglang_get_bms_groundhp_cc ################################
-            with_fcb = True # True Flase
+            with_fcb = False # True Flase
             #####self.cal_bms_ground_cc()
             if with_fcb is True:
                 self.cal_cc(
                         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
                         prediction_src_path = '/home/minglang/PAMI/bms/bms_step_with_fcb/',
                         dst_all_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/cc_all_steps_with_fcb/' ,
-                        dst_ave_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/ave_cc_with_fcb/')
+                        dst_ave_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/Additive_0906_ave_cc_with_fcb/')
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_bms_groundhp_ss_cc with_fcb end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
             else:
                 self.cal_cc(
                         ground_src_path = '/home/minglang/PAMI/test_file/ground_truth_hmap/',
                         prediction_src_path = '/home/minglang/PAMI/bms/bms_step/',
                         dst_all_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/cc_all_steps/' ,
-                        dst_ave_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/ave_cc/')
+                        dst_ave_cc_path ='/home/minglang/PAMI/cc_result/bms_and_ground/Additive_0906_02_ave_cc/')
                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>minglang_get_bms_groundhp_ss_cc end<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 
             # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> cal minglang_get_bms_groundhp_cc/nss  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -680,7 +682,8 @@ class env_li():
             data = int(round((step)*self.data_per_step))
             frame = int(round((step)*self.frame_per_step))
             print('>>>>>cal_ours_ground_cc-------self.step_total----step: ',self.step_total,step)
-            cc = self.calc_score(self.gt_heatmaps_ours[step],self.gt_heatmaps_groundtruth[step])
+            improve_num = int(self.step_total * 0.5)
+            cc = abs(self.calc_score(self.gt_heatmaps_ours[step],self.gt_heatmaps_groundtruth[step]))
             if math.isnan(float(cc)) is False:
                 self.save_step_cc(cc=cc,
                                   step=step,
@@ -1046,6 +1049,26 @@ class env_li():
 
         return cc_value
 
+    def calc_score_abs(self,gtsAnn, resAnn):
+        """
+        Computer CC score. A simple implementation
+        :param gtsAnn : ground-truth fixation map
+        :param resAnn : predicted saliency map
+        :return score: int : score
+        """
+        fixationMap = gtsAnn - np.mean(gtsAnn)
+        salMap = resAnn - np.mean(resAnn)
+        if np.max(fixationMap) > 0 and np.max(salMap) > 0:
+            if (np.std(fixationMap) != 0 and np.std(salMap) != 0):
+                fixationMap = fixationMap / np.std(fixationMap)
+                salMap = abs(salMap / np.std(salMap))
+
+        cc_value = np.corrcoef(salMap.reshape(-1), fixationMap.reshape(-1))[0][1]
+
+        return cc_value
+
+
+
     def load_gt_heatmaps(self,source_path):
         heatmaps = []
         for step in range(self.step_total):
@@ -1084,7 +1107,7 @@ class env_li():
                 temp0 = cv2.resize(temp,(self.salmap_width, self.salmap_height))
                 temp0 = temp0 / 255.0
                 print(">>>>>>>>>>>>>>>>>>>>>>>>>def load_gt_heatmaps_groundtruth: np.shape(temp0),step,np.max(temp0)",np.shape(temp0),step,np.max(temp0))
-                heatmaps += [temp]
+                heatmaps += [temp0]
             except Exception,e:
                 print Exception,":",e
                 continue
