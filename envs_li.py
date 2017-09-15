@@ -400,14 +400,11 @@ class env_li():
         # get and save groundtruth_heatmap,now0
         if data_processor_id is 'minglang_get_ground_truth_heatmap_for_nss':
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss start')
-
             self.save_gt_groundtruth_heatmaps_for_nss(
                                                         save_path = '/media/minglang/Data0/For_Maixu/Scanpath/'
                                                       )
-
             print('>>>>>>>>>>>>>>>>>>>> minglang_get_ground_truth_heatmap_for_nss end')
             print(myx)
-
 
         # get and save fcb_heatmap
         if data_processor_id is 'minglang_get_fcb':
